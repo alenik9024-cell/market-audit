@@ -24,7 +24,6 @@
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; }
     .container { max-width: 1680px; margin: 0 auto; }
 
-    /* Верхняя панель и проекты */
     header {
       display: flex;
       justify-content: space-between;
@@ -62,18 +61,13 @@
       align-items: center;
       gap: 8px;
       white-space: nowrap;
-      transition: all 0.15s ease;
     }
     .project-tab.active {
       background: rgba(37, 99, 235, 0.25);
       border-color: var(--accent);
       color: #93c5fd;
     }
-    .project-tab .tab-close {
-      color: #f87171;
-      font-size: 12px;
-      opacity: 0.6;
-    }
+    .project-tab .tab-close { color: #f87171; font-size: 12px; opacity: 0.6; }
     .project-tab .tab-close:hover { opacity: 1; }
 
     .btn {
@@ -141,10 +135,29 @@
     input:focus, select:focus, textarea:focus { border-color: var(--accent); }
     textarea { resize: vertical; min-height: 70px; }
 
-    /* Переключатель типа */
-    .type-switcher { display: flex; gap: 6px; margin-bottom: 12px; }
+    /* Переключатель режима: Новый vs Дополнение */
+    .mode-tabs-container {
+      background: rgba(11, 17, 32, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 14px;
+    }
+    .mode-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .mode-badge-new { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .mode-badge-edit { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+
+    /* Переключатель типа объекта */
+    .type-switcher { display: flex; gap: 6px; margin-bottom: 10px; }
     .type-btn {
-      flex: 1; padding: 7px; background: var(--input-bg); border: 1px solid var(--card-border);
+      flex: 1; padding: 6px; background: var(--input-bg); border: 1px solid var(--card-border);
       border-radius: 6px; color: var(--text-muted); cursor: pointer; font-size: 12px; font-weight: 600; text-align: center;
     }
     .type-btn.active.comp { background: rgba(37, 99, 235, 0.25); border-color: var(--accent); color: #93c5fd; }
@@ -161,8 +174,8 @@
     th.crit-col { width: 170px; min-width: 170px; background: #0c121e; }
     th.our-col { width: 230px; min-width: 230px; background: #064e3b; color: #a7f3d0; }
     td.our-cell { background: rgba(6, 78, 59, 0.15); }
-    th.comp-col { width: 240px; min-width: 240px; }
-    th.internal-col { width: 240px; min-width: 240px; background: #4c1d95; color: #ddd6fe; }
+    th.comp-col { width: 250px; min-width: 250px; }
+    th.internal-col { width: 250px; min-width: 250px; background: #4c1d95; color: #ddd6fe; }
     td.internal-cell { background: rgba(139, 92, 246, 0.1); }
     
     .editable-cell { outline: none; padding: 3px; border-radius: 4px; white-space: pre-wrap; word-break: break-word; }
@@ -178,13 +191,11 @@
     .status-error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; display: inline-block; }
     .status-success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; display: inline-block; }
 
-    /* Очередь заявок */
     .queue-item {
       background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 6px;
       padding: 8px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;
     }
 
-    /* Вкладки правой панели: Матрица / Стратегический отчет */
     .view-switcher { display: flex; gap: 6px; margin-bottom: 12px; }
     .view-btn {
       padding: 8px 14px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 6px;
@@ -192,7 +203,6 @@
     }
     .view-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    /* Стили стратегического отчета */
     .report-card {
       background: #0b1220; border: 1px solid #1e293b; border-radius: 8px; padding: 18px; margin-top: 10px;
       line-height: 1.6; font-size: 13px; color: #cbd5e1;
@@ -201,7 +211,6 @@
     .report-card ul { margin-left: 20px; margin-bottom: 10px; }
     .report-card strong { color: #fff; }
 
-    /* Modal */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000;
@@ -227,16 +236,29 @@
     </div>
   </header>
 
-  <!-- Вкладки независимых анализов (Проектов) -->
+  <!-- Вкладки проектов -->
   <div class="projects-bar" id="projectsBar"></div>
 
   <div class="main-grid">
-    <!-- Левая колонка: форма ввода, загрузка КП/аудио и эталон -->
-    <div>
+    <!-- Левая колонка: форма ввода -->
+    <div id="formContainer">
       <div class="card">
         <div class="card-title">
-          <span>➕ Добавить / Дополнить досье</span>
+          <span>📝 Карточка аудита</span>
           <span id="scanStatus" class="status-msg"></span>
+        </div>
+
+        <!-- БЛОК ПЕРЕКЛЮЧЕНИЯ: НОВЫЙ ИЛИ ДОПОЛНЕНИЕ СУЩЕСТВУЮЩЕГО -->
+        <div class="mode-tabs-container">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div id="currentModeBadge" class="mode-badge mode-badge-new">➕ Создание НОВОГО конкурента</div>
+            <button type="button" class="btn btn-secondary btn-xs" onclick="resetFormToNew()">🧹 Очистить под нового</button>
+          </div>
+
+          <label>Выбрать из сохраненных (для дозаполнения):</label>
+          <select id="existingSubjectSelect" onchange="onSelectExistingSubject(this.value)">
+            <option value="__NEW__">-- ➕ Нажмите сюда для создания НОВОГО конкурента --</option>
+          </select>
         </div>
 
         <label>Кого проверяем:</label>
@@ -249,13 +271,9 @@
           </div>
         </div>
 
-        <!-- Выбор существующего для добавления новой информации или ввод нового -->
         <div class="form-group">
-          <label id="subjectNameLabel">Имя / Компания (выберите из базы или впишите нового)</label>
-          <div style="display: flex; gap: 6px;">
-            <input type="text" id="targetName" list="existingCompetitorsList" placeholder="например: Конкурент Альфа или chinatoday.ru" onchange="loadExistingSubjectData(this.value)">
-            <datalist id="existingCompetitorsList"></datalist>
-          </div>
+          <label id="subjectNameLabel">Название конкурента / Ссылка</label>
+          <input type="text" id="targetName" placeholder="например: Конкурент Альфа или chinatoday.ru">
         </div>
 
         <div class="form-row">
@@ -280,10 +298,10 @@
           </div>
         </div>
 
-        <!-- Блок фиксации времени -->
+        <!-- Фиксация времени -->
         <div style="background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 12px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <label style="margin: 0; color: #93c5fd;">⏱️ Время и скорость ответа</label>
+            <label style="margin: 0; color: #93c5fd;">⏱️ Время подачи и первого ответа</label>
             <button type="button" class="btn btn-secondary btn-xs" onclick="parkLeadToWaiting()">📌 В ожидание</button>
           </div>
           <div class="form-row">
@@ -316,20 +334,20 @@
           <div id="pendingList"></div>
         </div>
 
-        <!-- Загрузка файлов (Аудио, КП, Счета, Прайсы) -->
+        <!-- Загрузка материалов -->
         <div class="form-group" style="background: rgba(37,99,235,0.06); border: 1px dashed #3b82f6; border-radius: 8px; padding: 10px;">
-          <label style="color: #93c5fd;">📎 Загрузить материал (Аудиозапись, PDF-КП, Счёт, Скан)</label>
+          <label style="color: #93c5fd;">📎 Загрузить материал (Аудио звонка, PDF-счёт, КП, скан)</label>
           <input type="file" id="materialFileInput" accept="audio/*,application/pdf,image/*" onchange="handleMaterialPick(this)">
           <div id="materialFileInfo" style="font-size: 11px; color: #93c5fd; margin-top: 4px;"></div>
         </div>
 
         <div class="form-group">
-          <label>Текст диалога / заметки / доп. инфо по касанию</label>
-          <textarea id="dialogTranscriptInput" placeholder="Вставьте переписку, комментарии или выдержки из разговора..."></textarea>
+          <label>Текст переписки / заметки по диалогу</label>
+          <textarea id="dialogTranscriptInput" placeholder="Вставьте переписку, детали звонка или комментарии..."></textarea>
         </div>
 
-        <button type="button" id="submitAuditBtn" class="btn" style="width: 100%; justify-content: center; padding: 10px;" onclick="executeIncrementalAnalysis()">
-          🤖 Запустить AI-аудит (Дополнить досье)
+        <button type="button" id="submitAuditBtn" class="btn" style="width: 100%; justify-content: center; padding: 11px; font-size: 13px;" onclick="executeIncrementalAnalysis()">
+          🤖 Запустить AI-аудит (Добавить в матрицу)
         </button>
       </div>
 
@@ -398,7 +416,7 @@
                   <input type="radio" name="reportMode" value="with_us" checked> В сравнении с Нашей компанией
                 </label>
                 <label style="font-size: 12px; cursor: pointer; text-transform: none; margin-left: 10px;">
-                  <input type="radio" name="reportMode" value="pure_market"> Чистый срез рынка (без нашей компании)
+                  <input type="radio" name="reportMode" value="pure_market"> Чистый срез рынка (без нас)
                 </label>
               </div>
             </div>
@@ -451,7 +469,6 @@
 </div>
 
 <script>
-// --- Структура и Хранилище Проектов ---
 const CRITERIA = [
   { key: "speed", label: "Скорость и канал первого ответа" },
   { key: "offer", label: "Что предлагают (продукт, комплектация)" },
@@ -496,18 +513,19 @@ let globalDatabase = {
 
 let currentSubjectType = "comp";
 let activePickedFile = null;
+let currentEditingSubjectId = null; // null = создание нового
 
 function getActiveProject() {
   return globalDatabase.projects.find(p => p.id === globalDatabase.activeProjectId) || globalDatabase.projects[0];
 }
 
 function initApp() {
-  const savedDb = localStorage.getItem("speshu_master_db_v6");
+  const savedDb = localStorage.getItem("speshu_master_db_v7");
   if (savedDb) {
     try { globalDatabase = JSON.parse(savedDb); } catch(e){}
   }
 
-  const savedCfg = localStorage.getItem("speshu_cfg_v6");
+  const savedCfg = localStorage.getItem("speshu_cfg_v7");
   if (savedCfg) {
     try {
       const c = JSON.parse(savedCfg);
@@ -523,7 +541,7 @@ function initApp() {
 }
 
 function persistDatabase() {
-  localStorage.setItem("speshu_master_db_v6", JSON.stringify(globalDatabase));
+  localStorage.setItem("speshu_master_db_v7", JSON.stringify(globalDatabase));
 }
 
 function getApiConfig() {
@@ -564,7 +582,7 @@ function switchProject(pId) {
 }
 
 function createNewProject() {
-  const name = prompt("Введите название нового анализа (например: Доставка станков 2026):");
+  const name = prompt("Введите название нового анализа (например: Оборудование 2026):");
   if (!name || !name.trim()) return;
 
   const newProj = {
@@ -587,7 +605,7 @@ function createNewProject() {
 
 function deleteProject(pId, event) {
   event.stopPropagation();
-  if (confirm("Удалить эту вкладку со всеми накопленными конкурентами?")) {
+  if (confirm("Удалить этот проект со всеми накопленными данными?")) {
     globalDatabase.projects = globalDatabase.projects.filter(p => p.id !== pId);
     if (globalDatabase.activeProjectId === pId) {
       globalDatabase.activeProjectId = globalDatabase.projects[0].id;
@@ -612,36 +630,85 @@ function loadCurrentProjectView() {
     document.getElementById("strategicReportContent").innerHTML = "Нажмите кнопку «Сформировать аудит», чтобы запустить комплексный маркетинговый анализ на основе накопленных данных по конкурентам.";
   }
 
-  updateCompetitorDatalist();
+  resetFormToNew();
+  updateExistingSubjectsDropdown();
   renderPendingLeads();
   renderMatrix();
 }
 
-// Автоподстановка существующих конкурентов
-function updateCompetitorDatalist() {
+// --- Управление режимом Дополнения / Создания нового ---
+function updateExistingSubjectsDropdown() {
   const proj = getActiveProject();
-  const datalist = document.getElementById("existingCompetitorsList");
-  datalist.innerHTML = "";
+  const select = document.getElementById("existingSubjectSelect");
+  select.innerHTML = `<option value="__NEW__">-- ➕ Нажмите сюда для создания НОВОГО конкурента --</option>`;
+
   proj.evaluatedList.forEach(sub => {
     const opt = document.createElement("option");
-    opt.value = sub.name;
-    datalist.appendChild(opt);
+    opt.value = sub.id;
+    opt.textContent = `🎯 ${sub.name} (${sub.type === 'internal' ? 'Наш' : 'Конкурент'})`;
+    select.appendChild(opt);
   });
-}
 
-function loadExistingSubjectData(name) {
-  const proj = getActiveProject();
-  const found = proj.evaluatedList.find(s => s.name.toLowerCase() === name.trim().toLowerCase());
-  if (found) {
-    switchSubjectType(found.type);
-    document.getElementById("scanStatus").textContent = "Найдено досье: данные будут дополнены";
-    document.getElementById("scanStatus").className = "status-msg status-loading";
-    document.getElementById("scanStatus").style.display = "inline-block";
-    setTimeout(() => { document.getElementById("scanStatus").style.display = "none"; }, 3000);
+  if (currentEditingSubjectId) {
+    select.value = currentEditingSubjectId;
   }
 }
 
-// Переключение типа (Конкурент / Наш менеджер)
+function resetFormToNew() {
+  currentEditingSubjectId = null;
+  document.getElementById("existingSubjectSelect").value = "__NEW__";
+  document.getElementById("currentModeBadge").className = "mode-badge mode-badge-new";
+  document.getElementById("currentModeBadge").textContent = "➕ Создание НОВОГО конкурента";
+  
+  document.getElementById("targetName").value = "";
+  document.getElementById("targetName").disabled = false;
+  document.getElementById("targetName").placeholder = "например: Конкурент Бета или site.ru";
+  document.getElementById("dialogTranscriptInput").value = "";
+  document.getElementById("reqTimeInput").value = "";
+  document.getElementById("respTimeInput").value = "";
+  document.getElementById("deltaManualInput").value = "";
+  document.getElementById("materialFileInput").value = "";
+  document.getElementById("materialFileInfo").textContent = "";
+  activePickedFile = null;
+
+  document.getElementById("submitAuditBtn").textContent = "🤖 Запустить AI-аудит (Добавить в матрицу)";
+}
+
+function onSelectExistingSubject(val) {
+  if (val === "__NEW__") {
+    resetFormToNew();
+    return;
+  }
+  loadSubjectForUpdating(val);
+}
+
+function loadSubjectForUpdating(subjectId) {
+  const proj = getActiveProject();
+  const sub = proj.evaluatedList.find(s => s.id === subjectId);
+  if (!sub) return;
+
+  currentEditingSubjectId = sub.id;
+  document.getElementById("existingSubjectSelect").value = sub.id;
+  
+  const badge = document.getElementById("currentModeBadge");
+  badge.className = "mode-badge mode-badge-edit";
+  badge.textContent = `✏️ Дополнение досье: ${sub.name}`;
+
+  switchSubjectType(sub.type);
+  document.getElementById("targetName").value = sub.name;
+  document.getElementById("targetName").disabled = true; // имя зафиксировано
+  
+  document.getElementById("dialogTranscriptInput").value = "";
+  document.getElementById("materialFileInput").value = "";
+  document.getElementById("materialFileInfo").textContent = "";
+  activePickedFile = null;
+
+  document.getElementById("submitAuditBtn").textContent = `🔄 Обновить досье «${sub.name}» новыми данными`;
+
+  // Плавный скролл к форме
+  document.getElementById("formContainer").scrollIntoView({ behavior: 'smooth' });
+}
+
 function switchSubjectType(type) {
   currentSubjectType = type;
   document.getElementById("typeCompBtn").className = `type-btn ${type === 'comp' ? 'active comp' : ''}`;
@@ -681,14 +748,14 @@ function autoCalculateDelta() {
   }
 }
 
-// Заявки в ожидании
+// Очередь заявок
 function parkLeadToWaiting() {
   const name = document.getElementById("targetName").value.trim();
   const channel = document.getElementById("targetChannel").value;
   let reqTime = document.getElementById("reqTimeInput").value.trim();
 
   if (!name) {
-    alert("Укажите имя или название компании.");
+    alert("Укажите имя конкурента или сотрудника.");
     return;
   }
   if (!reqTime) {
@@ -707,11 +774,7 @@ function parkLeadToWaiting() {
 
   persistDatabase();
   renderPendingLeads();
-
-  document.getElementById("targetName").value = "";
-  document.getElementById("reqTimeInput").value = "";
-  document.getElementById("respTimeInput").value = "";
-  document.getElementById("deltaManualInput").value = "";
+  resetFormToNew();
 }
 
 function renderPendingLeads() {
@@ -747,6 +810,8 @@ function renderPendingLeads() {
 function pickPendingLead(idx) {
   const proj = getActiveProject();
   const lead = proj.pendingLeads[idx];
+  
+  resetFormToNew();
   document.getElementById("targetName").value = lead.name;
   document.getElementById("targetChannel").value = lead.channel;
   document.getElementById("reqTimeInput").value = lead.reqTime;
@@ -770,7 +835,7 @@ function deletePendingLead(idx) {
 function handleMaterialPick(input) {
   if (input.files && input.files[0]) {
     activePickedFile = input.files[0];
-    document.getElementById("materialFileInfo").textContent = `Файл готов: ${activePickedFile.name} (${(activePickedFile.size/1024/1024).toFixed(2)} МБ)`;
+    document.getElementById("materialFileInfo").textContent = `Файл прикреплен: ${activePickedFile.name} (${(activePickedFile.size/1024/1024).toFixed(2)} МБ)`;
   }
 }
 
@@ -795,7 +860,7 @@ function fileToBase64Data(file) {
   });
 }
 
-// --- Инкрементальный анализ (дополнение досье) ---
+// --- Выполнение анализа (Создание или Обновление) ---
 async function executeIncrementalAnalysis() {
   const cfg = getApiConfig();
   if (!cfg.apiKey) {
@@ -820,31 +885,31 @@ async function executeIncrementalAnalysis() {
   }
 
   const proj = getActiveProject();
-  const existingSub = proj.evaluatedList.find(s => s.name.toLowerCase() === name.toLowerCase());
+  const existingSub = currentEditingSubjectId ? proj.evaluatedList.find(s => s.id === currentEditingSubjectId) : null;
 
   const submitBtn = document.getElementById("submitAuditBtn");
   submitBtn.disabled = true;
 
   try {
-    setStatus("🤖 Анализ нового касания и материалов...", "loading");
+    setStatus("🤖 AI-анализ материалов...", "loading");
 
     const isInternal = currentSubjectType === 'internal';
-    let promptText = `Ты — ведущий эксперт по коммерческому аудиту продаж, ценообразованию и бенчмаркингу в сфере "${proj.niche}".
-Объект проверки: ${isInternal ? 'НАШ МЕНЕДЖЕР' : 'КОНКУРЕНТ'} "${name}".
-Канал: ${channel}. Зафиксированная скорость ответа: ${speedDelta || 'не указана'}. Поведение дожима: ${closingBehavior}.`;
+    let promptText = `Ты — ведущий эксперт по коммерческому аудиту продаж, ценообразованию и маркетинговому бенчмаркингу в сфере "${proj.niche}".
+Объект проверки: ${isInternal ? 'НАШ СОБСТВЕННЫЙ МЕНЕДЖЕР' : 'КОНКУРЕНТ'} "${name}".
+Канал: ${channel}. Скорость ответа: ${speedDelta || 'не указана'}. Поведение дожима: ${closingBehavior}.`;
 
     if (existingSub) {
-      promptText += `\n\nРАНЕЕ СОБРАННЫЕ ДАННЫЕ ПО ЭТОМУ ОБЪЕКТУ:\n${JSON.stringify(existingSub, null, 2)}\n\nТвоя задача — ДОПОЛНИТЬ и УТОЧНИТЬ досье на основе новых прикрепленных материалов (КП, счетов, звонков или текста), сохранив то, что было, и актуализировав смету, цены и оценки.`;
+      promptText += `\n\nРАНЕЕ СОБРАННЫЕ ДАННЫЕ:\n${JSON.stringify(existingSub, null, 2)}\n\nТвоя задача — ДОПОЛНИТЬ и УТОЧНИТЬ коммерческое досье на основе новых прикрепленных материалов (КП, счетов, аудиозвонков или заметок). Сохрани ценное и обнови смету, цены и выводы.`;
     } else {
-      promptText += `\n\nПроанализируй первичное касание и сформируй полное коммерческое досье.`;
+      promptText += `\n\nПроанализируй первое касание и сформируй полное коммерческое досье.`;
     }
 
     promptText += `\n\nВерни результат СТРОГО в формате JSON без кавычек и markdown:
 {
-  "offer": "Что предлагают: состав пакета, модификации, номенклатура, состав услуг",
+  "offer": "Что предлагают: состав пакета, номенклатура, состав услуг, комплектация",
   "price": "Цены, порядок оплаты, скрытые комиссии, курс валют, предоплата, условия скидок",
   "delivery": "Сроки, логистика, Incoterms, гарантийные обязательства, штрафы",
-  "qualification": "Квалификация: задавались ли открытые вопросы о бюджете, ЛПР, критериях",
+  "qualification": "Квалификация: задавались ли открытые вопросы о задачах, бюджете, ЛПР",
   "objections": "Отработка сомнений: аргументы ценности против падения в скидку",
   "closing": "Дожим: дедлайн, CTA, договоренность о следующем шаге",
   "score": "Итоговая оценка продаж от 1 до 10 (целое число)",
@@ -864,11 +929,6 @@ async function executeIncrementalAnalysis() {
         userContent.push({
           type: "input_audio",
           input_audio: { data: b64, format: ext === 'wav' ? 'wav' : 'mp3' }
-        });
-      } else if (activePickedFile.type === 'application/pdf') {
-        userContent.push({
-          type: "image_url",
-          image_url: { url: `data:application/pdf;base64,${b64}` }
         });
       } else {
         userContent.push({
@@ -943,21 +1003,14 @@ async function executeIncrementalAnalysis() {
     }
 
     persistDatabase();
-    updateCompetitorDatalist();
+    updateExistingSubjectsDropdown();
     renderMatrix();
+    renderProjectsTabs();
 
-    setStatus("Досье успешно обновлено!", "success");
+    setStatus("Успешно сохранено!", "success");
     setTimeout(() => setStatus(null), 3000);
 
-    // Очистка формы
-    document.getElementById("targetName").value = "";
-    document.getElementById("dialogTranscriptInput").value = "";
-    document.getElementById("reqTimeInput").value = "";
-    document.getElementById("respTimeInput").value = "";
-    document.getElementById("deltaManualInput").value = "";
-    document.getElementById("materialFileInput").value = "";
-    document.getElementById("materialFileInfo").textContent = "";
-    activePickedFile = null;
+    resetFormToNew();
 
   } catch (err) {
     console.error(err);
@@ -986,12 +1039,15 @@ function renderMatrix() {
     const isInternal = sub.type === 'internal';
     th.className = isInternal ? "internal-col" : "comp-col";
     th.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         <div>
-          <div style="font-weight:700;">${escapeHtml(sub.name)}</div>
-          <div style="font-size:10px; font-weight:normal; opacity:0.8;">${isInternal ? '🏢 Наш аудит' : '🎯 Конкурент'}</div>
+          <div style="font-weight:700; font-size:13px;">${escapeHtml(sub.name)}</div>
+          <div style="font-size:10px; opacity:0.8; margin-top:2px;">${isInternal ? '🏢 Наш аудит' : '🎯 Конкурент'}</div>
         </div>
-        <button onclick="removeSubject(${sIdx})" style="background:none; border:none; color:#f87171; cursor:pointer; font-size:14px; margin-left:6px;">✕</button>
+        <div style="display:flex; gap:4px; margin-left:6px;">
+          <button class="btn btn-secondary btn-xs" style="padding:2px 6px;" title="Дополнить досье новыми данными" onclick="loadSubjectForUpdating('${sub.id}')">✏️ Дополнить</button>
+          <button class="btn btn-danger btn-xs" style="padding:2px 6px;" title="Удалить" onclick="removeSubject(${sIdx})">✕</button>
+        </div>
       </div>
     `;
     header.appendChild(th);
@@ -1053,20 +1109,22 @@ function removeSubject(idx) {
     const proj = getActiveProject();
     proj.evaluatedList.splice(idx, 1);
     persistDatabase();
-    updateCompetitorDatalist();
+    updateExistingSubjectsDropdown();
     renderMatrix();
     renderProjectsTabs();
+    resetFormToNew();
   }
 }
 
 function clearCurrentProjectMatrix() {
-  if (confirm("Очистить всех конкурентов в текущем проекте?")) {
+  if (confirm("Очистить всех участников в текущем проекте?")) {
     const proj = getActiveProject();
     proj.evaluatedList = [];
     persistDatabase();
-    updateCompetitorDatalist();
+    updateExistingSubjectsDropdown();
     renderMatrix();
     renderProjectsTabs();
+    resetFormToNew();
   }
 }
 
@@ -1088,7 +1146,6 @@ function saveOurStandard() {
   alert("Эталон компании сохранен.");
 }
 
-// --- Переключение видов (Матрица / Стратегический отчет) ---
 function switchRightView(view) {
   document.getElementById("viewMatrixBtn").classList.toggle("active", view === 'matrix');
   document.getElementById("viewReportBtn").classList.toggle("active", view === 'report');
@@ -1096,7 +1153,7 @@ function switchRightView(view) {
   document.getElementById("reportViewContainer").style.display = view === 'report' ? 'block' : 'none';
 }
 
-// --- Генерация Стратегического Аудита (Senior Marketer) ---
+// --- Стратегический анализ ---
 async function generateStrategicReport() {
   const proj = getActiveProject();
   if (!proj.evaluatedList.length) {
@@ -1170,7 +1227,7 @@ ${isWithUs ? `
   }
 }
 
-// --- Бэкап и Переносимость (JSON) ---
+// --- Бэкап и Экспорт ---
 function exportDatabaseJSON() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalDatabase, null, 2));
   const link = document.createElement("a");
@@ -1204,7 +1261,6 @@ function importDatabaseJSON(input) {
   reader.readAsText(file);
 }
 
-// --- Экспорт в CSV / Excel ---
 function exportToCSV() {
   const proj = getActiveProject();
   let csv = "\uFEFF";
@@ -1277,7 +1333,7 @@ function saveSettings() {
     apiBase: document.getElementById("cfgApiBase").value.trim(),
     model: document.getElementById("cfgModel").value.trim()
   };
-  localStorage.setItem("speshu_cfg_v6", JSON.stringify(c));
+  localStorage.setItem("speshu_cfg_v7", JSON.stringify(c));
   closeSettingsModal();
 }
 
