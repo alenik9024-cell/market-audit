@@ -16,6 +16,7 @@
       --warning: #f59e0b;
       --danger: #ef4444;
       --purple: #8b5cf6;
+      --cyan: #06b6d4;
       --text: #f1f5f9;
       --text-muted: #94a3b8;
       --input-bg: #0a0f1d;
@@ -58,7 +59,6 @@
       border-color: rgba(245, 158, 11, 0.3);
     }
 
-    /* Панель проектов и корневой каталог */
     .projects-bar {
       display: flex;
       align-items: center;
@@ -114,6 +114,8 @@
     .btn-secondary:hover { background: #334668; }
     .btn-success { background: var(--success); }
     .btn-purple { background: var(--purple); }
+    .btn-cyan { background: var(--cyan); color: #082f49; }
+    .btn-cyan:hover { background: #0891b2; color: #fff; }
     .btn-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
     .btn-danger:hover { background: var(--danger); color: #fff; }
     .btn-xs { padding: 3px 7px; font-size: 11px; border-radius: 4px; }
@@ -212,6 +214,26 @@
     }
     .preview-box img { max-width: 48px; max-height: 48px; border-radius: 4px; object-fit: cover; }
 
+    /* Блок истории материалов в карточке */
+    .history-log-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      max-height: 120px;
+      overflow-y: auto;
+      font-size: 11px;
+    }
+    .history-item {
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+      color: #cbd5e1;
+    }
+    .history-item:last-child { border-bottom: none; }
+
     .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid var(--card-border); }
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
     th, td { padding: 9px 11px; border-bottom: 1px solid var(--card-border); border-right: 1px solid var(--card-border); vertical-align: top; }
@@ -295,7 +317,6 @@
     }
     .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; width: 620px; max-width: 92vw; padding: 22px; }
 
-    /* Таблица в каталоге проектов */
     .catalog-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
     .catalog-table th, .catalog-table td { padding: 8px 10px; border-bottom: 1px solid var(--card-border); }
     .catalog-table th { background: #0c121e; color: #94a3b8; text-align: left; }
@@ -308,7 +329,7 @@
   <header>
     <div class="brand">
       <h1>⚡ КонкурентСкан Pro</h1>
-      <p>Корпоративный бенчмаркинг, аудит звонков/счетов и практические рекомендации для РОПа</p>
+      <p>Бенчмаркинг, память аудиозвонков, OSINT-разведка по сети и рекомендации РОПу</p>
     </div>
     <div class="header-actions">
       <div id="cloudSyncStatus" class="cloud-badge" onclick="openSettingsModal()" title="Google Apps Script подключен">
@@ -322,7 +343,6 @@
     </div>
   </header>
 
-  <!-- Панель проектов с каталогом -->
   <div class="projects-bar" id="projectsBar"></div>
 
   <div class="main-grid">
@@ -357,8 +377,11 @@
         </div>
 
         <div class="form-group">
-          <label id="subjectNameLabel">Название / Контакт</label>
-          <input type="text" id="targetName" placeholder="например: Конкурент Бета или site.ru">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label id="subjectNameLabel">Название / Сайт компании</label>
+            <button type="button" class="btn btn-cyan btn-xs" onclick="runPublicIntelligenceForInput()" title="Собрать досье по сайту, отзывам и тарифам">🌐 Найти данные в сети</button>
+          </div>
+          <input type="text" id="targetName" placeholder="например: ChinaToday или chinatoday.ru">
         </div>
 
         <div class="form-row">
@@ -371,6 +394,7 @@
               <option value="Telegram">Telegram</option>
               <option value="Email">Email</option>
               <option value="КП / Счёт">КП / Счёт / Документ</option>
+              <option value="Открытые источники / Сайт">Открытые источники / Сайт</option>
             </select>
           </div>
           <div class="form-group">
@@ -427,7 +451,7 @@
               Нажмите для выбора или просто нажмите <span style="background: rgba(37,99,235,0.4); padding: 2px 6px; border-radius: 4px;">Ctrl + V</span> со скриншотом!
             </div>
             <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
-              WhatsApp/Telegram переписка, сметы, КП, аудиозаписи звонков
+              WhatsApp/Telegram переписка, сметы, КП, аудиозаписи звонков .m4a/.mp3
             </div>
             <input type="file" id="materialFileInput" accept="audio/*,application/pdf,image/*" style="display: none;" onchange="handleMaterialPick(this)">
           </div>
@@ -440,6 +464,12 @@
             </div>
             <button type="button" onclick="clearAttachedFile(event)" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 16px;">✕</button>
           </div>
+        </div>
+
+        <!-- Список сохраненных материалов/звонков -->
+        <div id="savedMaterialsSection" style="display: none;">
+          <label style="color: #a7f3d0;">📂 Сохраненные звонки и материалы этого конкурента:</label>
+          <div id="savedMaterialsList" class="history-log-box"></div>
         </div>
 
         <div class="form-group">
@@ -476,7 +506,7 @@
 
         <div id="matrixViewContainer">
           <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
-            💡 Кликните по любой ячейке таблицы, чтобы отредактировать. Нажмите <strong>«⚡ ИИ»</strong> в шапке любого конкурента для мгновенного разбора.
+            💡 Кликните по любой ячейке таблицы, чтобы отредактировать. Нажмите <strong>«⚡ ИИ»</strong> для мгновенного разбора всех звонков или <strong>«🌐»</strong> для разведки в сети.
           </p>
           <div class="table-container">
             <table id="matrixTable">
@@ -523,7 +553,7 @@
           </div>
 
           <div id="strategicReportContent" class="report-card">
-            Нажмите кнопку «Сформировать глубокий аудит», чтобы запустить профессиональный коммерческий разбор конкурентов и получить конкретные рекомендации для нашей компании.
+            Нажмите кнопку «Сформировать глубокий аудит», чтобы запустить профессиональный коммерческий разбор конкурентов (на основе звонков, смет и разведки в сети) и получить конкретные рекомендации для нашей компании.
           </div>
         </div>
       </div>
@@ -620,7 +650,8 @@ const CRITERIA = [
   { key: "closing", label: "Тактика дожима (дедлайн, CTA)" },
   { key: "score", label: "Оценка работы менеджера (1-10)" },
   { key: "pros", label: "Сильные стороны (что забрать себе)" },
-  { key: "cons", label: "Слабые места (где мы сильнее)" }
+  { key: "cons", label: "Слабые места (где мы сильнее)" },
+  { key: "publicIntel", label: "Открытые источники и репутация" } // Новая ключевая строка разведки!
 ];
 
 let globalDatabase = {
@@ -642,7 +673,9 @@ let globalDatabase = {
         closing: "Призыв к бесплатному аудиту / встрече",
         score: "8",
         pros: "Собственный штат, быстрая поддержка, прозрачность",
-        cons: "Требуется усилить дожим после отправки расчета"
+        cons: "Требуется усилить дожим после отправки расчета",
+        publicIntel: "Белая таможня, прозрачный расчет без скрытых надбавок",
+        materialsLog: []
       },
       pendingLeads: [],
       evaluatedList: [],
@@ -660,7 +693,7 @@ function getActiveProject() {
 }
 
 async function initApp() {
-  const savedCfg = localStorage.getItem("speshu_cfg_v14");
+  const savedCfg = localStorage.getItem("speshu_cfg_v16");
   if (savedCfg) {
     try {
       const c = JSON.parse(savedCfg);
@@ -674,7 +707,7 @@ async function initApp() {
     document.getElementById("cfgCloudUrl").value = DEFAULT_CLOUD_URL;
   }
 
-  const savedDb = localStorage.getItem("speshu_master_db_v14");
+  const savedDb = localStorage.getItem("speshu_master_db_v16");
   if (savedDb) {
     try { globalDatabase = JSON.parse(savedDb); } catch(e){}
   }
@@ -767,8 +800,11 @@ async function syncWithCloud(silent = false) {
       globalDatabase = data;
       globalDatabase.projects.forEach(p => {
         if (!p.ourCompany && p.ourStandard) p.ourCompany = { ...p.ourStandard };
+        p.evaluatedList.forEach(sub => {
+          if (!sub.materialsLog) sub.materialsLog = [];
+        });
       });
-      localStorage.setItem("speshu_master_db_v14", JSON.stringify(globalDatabase));
+      localStorage.setItem("speshu_master_db_v16", JSON.stringify(globalDatabase));
       renderProjectsTabs();
       loadCurrentProjectView();
       badge.className = "cloud-badge";
@@ -788,7 +824,7 @@ async function syncWithCloud(silent = false) {
 }
 
 function persistDatabase() {
-  localStorage.setItem("speshu_master_db_v14", JSON.stringify(globalDatabase));
+  localStorage.setItem("speshu_master_db_v16", JSON.stringify(globalDatabase));
   
   const cloudUrl = getCloudUrl();
   if (cloudUrl) {
@@ -823,7 +859,6 @@ function renderProjectsTabs() {
   const bar = document.getElementById("projectsBar");
   bar.innerHTML = "";
 
-  // Кнопка каталога проектов
   const catalogBtn = document.createElement("button");
   catalogBtn.className = "btn btn-purple btn-xs";
   catalogBtn.innerHTML = "📁 Каталог проектов";
@@ -913,7 +948,6 @@ function deleteProject(pId, event) {
   }
 }
 
-// Корневой каталог проектов (Модалка)
 function openCatalogModal() {
   renderCatalogList();
   document.getElementById("catalogModal").style.display = "flex";
@@ -990,12 +1024,13 @@ function resetFormToNew() {
   switchSubjectType('comp');
   document.getElementById("targetName").value = "";
   document.getElementById("targetName").disabled = false;
-  document.getElementById("targetName").placeholder = "например: Конкурент Бета или site.ru";
+  document.getElementById("targetName").placeholder = "например: ChinaToday или chinatoday.ru";
   document.getElementById("dialogTranscriptInput").value = "";
   document.getElementById("reqTimeInput").value = "";
   document.getElementById("respTimeInput").value = "";
   document.getElementById("deltaManualInput").value = "";
   document.getElementById("closingSelect").value = "auto";
+  document.getElementById("savedMaterialsSection").style.display = "none";
   clearAttachedFile();
 
   document.getElementById("submitAuditBtn").textContent = "🤖 Запустить AI-анализ";
@@ -1029,12 +1064,14 @@ function loadSubjectForUpdating(subjectId) {
   document.getElementById("targetName").value = sub.name;
   document.getElementById("targetName").disabled = true;
   
-  // Автоподтягивание ранее сохранённого текста
   document.getElementById("dialogTranscriptInput").value = sub.offer && sub.offer !== '—' ? sub.offer : '';
   document.getElementById("closingSelect").value = "auto";
   clearAttachedFile();
 
-  document.getElementById("submitAuditBtn").textContent = `🔄 Разобрать через ИИ «${sub.name}»`;
+  // Отрисовка списка ранее загруженных материалов
+  renderSavedMaterialsList(sub.materialsLog);
+
+  document.getElementById("submitAuditBtn").textContent = `🔄 Дополнить / Разобрать через ИИ «${sub.name}»`;
   document.getElementById("formContainer").scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -1055,8 +1092,30 @@ function loadOurCompanyForAudit() {
   document.getElementById("closingSelect").value = "auto";
   clearAttachedFile();
 
+  renderSavedMaterialsList(proj.ourCompany.materialsLog);
+
   document.getElementById("submitAuditBtn").textContent = "🤖 Проанализировать работу НАШЕГО менеджера";
   document.getElementById("formContainer").scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderSavedMaterialsList(log) {
+  const sec = document.getElementById("savedMaterialsSection");
+  const list = document.getElementById("savedMaterialsList");
+  if (!log || !log.length) {
+    sec.style.display = "none";
+    return;
+  }
+  sec.style.display = "block";
+  list.innerHTML = "";
+  log.forEach(item => {
+    const d = document.createElement("div");
+    d.className = "history-item";
+    d.innerHTML = `
+      <span>${escapeHtml(item.icon || '📎')} <strong>${escapeHtml(item.name)}</strong> <span style="color:#94a3b8;">(${escapeHtml(item.type)})</span></span>
+      <span style="color:#64748b;">${escapeHtml(item.time)}</span>
+    `;
+    list.appendChild(d);
+  });
 }
 
 function switchSubjectType(type) {
@@ -1072,7 +1131,6 @@ function switchSubjectType(type) {
   }
 }
 
-// Фиксация времени
 function setNowTime(targetInputId) {
   const d = new Date();
   const timeStr = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
@@ -1244,7 +1302,9 @@ function manualSaveSubjectCard() {
         closing: "—",
         score: "7",
         pros: "—",
-        cons: "—"
+        cons: "—",
+        publicIntel: "—",
+        materialsLog: []
       });
       alert("Конкурент сохранен в облако!");
     }
@@ -1276,7 +1336,7 @@ function cleanAndParseJSON(raw) {
     try { return JSON.parse(noTrailing); } catch (e) {}
   }
 
-  const keys = ["speed", "offer", "price", "delivery", "qualification", "objections", "closing", "recalled", "score", "pros", "cons"];
+  const keys = ["speed", "offer", "price", "delivery", "qualification", "objections", "closing", "recalled", "score", "pros", "cons", "publicIntel"];
   const result = {};
   let matchedCount = 0;
 
@@ -1311,11 +1371,104 @@ function cleanAndParseJSON(raw) {
     recalled: "—",
     score: "6",
     pros: "Данные получены",
-    cons: "—"
+    cons: "—",
+    publicIntel: "—"
   };
 }
 
-// --- МГНОВЕННЫЙ АНАЛИЗ УЖЕ СОХРАНЕННОГО КОНКУРЕНТА ПРЯМО ИЗ ТАБЛИЦЫ ---
+// --- OSINT РАЗВЕДКА В СЕТИ ПО КОМПАНИИ (Сайт, Отзывы, Тарифы) ---
+async function runPublicIntelligenceForInput() {
+  const name = document.getElementById("targetName").value.trim();
+  if (!name) {
+    alert("Сначала введите название или сайт конкурента в поле выше (например: ChinaToday или chinatoday.ru).");
+    return;
+  }
+  await executePublicIntelligence(null, name);
+}
+
+async function executePublicIntelligence(subjectId, optionalName) {
+  const proj = getActiveProject();
+  const cfg = getApiConfig();
+
+  if (!cfg.apiKey) {
+    alert("Укажите API-ключ в настройках ⚙️");
+    openSettingsModal();
+    return;
+  }
+
+  const isOur = subjectId === '__OUR__';
+  const targetObj = isOur ? proj.ourCompany : (subjectId ? proj.evaluatedList.find(s => s.id === subjectId) : null);
+  const targetName = optionalName || (targetObj ? targetObj.name : "Конкурент");
+
+  setStatus(`🌐 Сбор открытых данных по «${targetName}»...`, "loading");
+
+  try {
+    const promptText = `Ты — ведущий OSINT-аналитик рынка B2B и логистики (ВЭД с Китаем).
+Проведи глубокую рыночную разведку компании "${targetName}" в сфере "${proj.niche}".
+
+Опираясь на публичную информацию, официальный сайт компании, жалобы и отзывы реальных клиентов на форумах, VC, Otzovik, Habr, Rusprofile:
+1. Выясни реальные тарифы, минимальный чек и модель монетизации (платный подбор, наценка на курс юаня, комиссия за выкуп, скрытые платежи).
+2. На что чаще всего ЖАЛУЮТСЯ заказчики (задержки, занижение плотности, перегруз, проблемы с белыми документами).
+3. Сильные реальные преимущества компании.
+
+СТРОГОЕ ПРАВИЛО: Верни ответ ТОЛЬКО в формате JSON без кавычек внутри строк.
+Формат:
+{
+  "publicIntel": "Краткая выжимка: сайт, позиционирование, отзывы клиентов и риски схемы",
+  "offer": "Публичный оффер компании: комплектации, белая/карго доставка, проверка поставщиков",
+  "price": "Публичные тарифы, процент за выкуп, курс юаня, минимальный чек",
+  "delivery": "Заявленные сроки доставки и условия гарантии",
+  "pros": "В чем их реальная сила на рынке",
+  "cons": "На что жалуются клиенты, скрытые платежи и слабые места",
+  "score": "7"
+}`;
+
+    const response = await fetch(`${cfg.apiBase}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cfg.apiKey}` },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [{ role: "user", content: promptText }],
+        temperature: 0.2,
+        max_tokens: 3000
+      })
+    });
+
+    if (!response.ok) throw new Error(`Ошибка API (${response.status}): ${await response.text()}`);
+
+    const data = await response.json();
+    const result = cleanAndParseJSON(data.choices[0].message.content);
+
+    if (targetObj) {
+      targetObj.publicIntel = result.publicIntel || targetObj.publicIntel;
+      if (!targetObj.price || targetObj.price === '—') targetObj.price = result.price;
+      if (!targetObj.delivery || targetObj.delivery === '—') targetObj.delivery = result.delivery;
+      if (!targetObj.offer || targetObj.offer === '—') targetObj.offer = result.offer;
+      if (result.pros && result.pros !== '—') targetObj.pros = (targetObj.pros && targetObj.pros !== '—') ? `${targetObj.pros} | ${result.pros}` : result.pros;
+      if (result.cons && result.cons !== '—') targetObj.cons = (targetObj.cons && targetObj.cons !== '—') ? `${targetObj.cons} | ${result.cons}` : result.cons;
+    } else {
+      // Если создавался новый через поле ввода
+      document.getElementById("dialogTranscriptInput").value = `[Данные из сети]: ${result.publicIntel}\nОффер: ${result.offer}\nЦены: ${result.price}\nСроки: ${result.delivery}`;
+      alert(`Данные из сети по «${targetName}» собраны и подставлены в поле заметок! Теперь нажмите «Сохранить» или прикрепите звонок.`);
+    }
+
+    persistDatabase();
+    renderMatrix();
+    setStatus("Разведка завершена!", "success");
+    setTimeout(() => setStatus(null), 3000);
+
+    if (targetObj) {
+      alert(`Готово! Досье «${targetName}» дополнено информацией из открытых источников и отзывами клиентов.`);
+    }
+
+  } catch(e) {
+    console.error(e);
+    alert(`Ошибка сбора данных: ${e.message}`);
+    setStatus("Ошибка", "error");
+  }
+}
+
+// --- УМНЫЙ АНАЛИЗ КОНКУРЕНТА ИЗ ТАБЛИЦЫ (ВСЕ НАКОПЛЕННЫЕ ЗВОНКИ + МАТЕРИАЛЫ) ---
 async function analyzeExistingCompetitor(subjectId) {
   const proj = getActiveProject();
   const cfg = getApiConfig();
@@ -1331,25 +1484,35 @@ async function analyzeExistingCompetitor(subjectId) {
   if (!targetObj) return;
 
   const targetName = isOur ? "НАША КОМПАНИЯ" : targetObj.name;
-  const existingText = [targetObj.offer, targetObj.price, targetObj.delivery, targetObj.pros, targetObj.cons].filter(t => t && t !== '—').join("\n");
+  
+  // Собираем ВСЕ тексты из истории материалов + строки карточки
+  let materialsText = (targetObj.materialsLog || []).map(m => `[Материал: ${m.name} (${m.type})]:\n${m.content || ''}`).join("\n\n");
+  let existingText = [targetObj.offer, targetObj.price, targetObj.delivery, targetObj.pros, targetObj.cons, targetObj.qualification, targetObj.objections, targetObj.closing].filter(t => t && t !== '—' && t !== 'Уточняется').join("\n\n");
 
-  if (!existingText || existingText.length < 5) {
-    alert(`Сначала добавьте текст переписки, скриншот или аудио для «${targetName}» через кнопку «✏️ Дополнить» слева.`);
-    loadSubjectForUpdating(subjectId);
+  let fullContext = [materialsText, existingText].filter(Boolean).join("\n\n");
+
+  // Если текста совсем нет — запускаем разведку по сайту
+  if (!fullContext || fullContext.length < 15) {
+    const answer = confirm(`Для «${targetName}» пока нет сохраненных звонков или переписки.\n\nХотите запустить автоматическую разведку по открытым источникам, сайту и отзывам клиентов в сети?`);
+    if (answer) {
+      await executePublicIntelligence(subjectId);
+    } else {
+      loadSubjectForUpdating(subjectId);
+    }
     return;
   }
 
   setStatus(`🤖 Анализ «${targetName}» через ИИ...`, "loading");
 
   try {
-    const promptText = `Ты — строгий коммерческий аудитор продаж и эксперт по ценообразованию в сфере "${proj.niche}".
+    const promptText = `Ты — строгий коммерческий аудитор продаж, эксперт по логистике ВЭД с Китаем и ценообразованию в сфере "${proj.niche}".
 Объект проверки: ${isOur ? 'НАША СОБСТВЕННАЯ КОМПАНИЯ' : `КОНКУРЕНТ "${targetName}"`}.
-Вот исходный текст сообщений менеджера / переписки:
+Вот ПОЛНАЯ ИСТОРИЯ материалов, расшифровок звонков, скриншотов и переписок по этому объекту:
 """
-${existingText}
+${fullContext}
 """
 
-Разбери этот материал и заполни ВСЕ 11 параметров.
+Твоя задача — детально разобрать этот материал и заполнить ВСЕ 11 параметров коммерческого досье.
 СТРОГОЕ ПРАВИЛО: Верни ответ ТОЛЬКО в формате JSON без кавычек внутри строк.
 Формат:
 {
@@ -1363,7 +1526,8 @@ ${existingText}
   "recalled": "Повторные касания: как часто перезванивают / пишут",
   "score": "7",
   "pros": "Сильные стороны",
-  "cons": "Слабые места, риски, ошибки"
+  "cons": "Слабые места, риски, ошибки",
+  "publicIntel": "Особенности позиционирования и схемы работы"
 }`;
 
     const response = await fetch(`${cfg.apiBase}/chat/completions`, {
@@ -1392,6 +1556,7 @@ ${existingText}
     targetObj.score = String(result.score || targetObj.score || "7");
     targetObj.pros = result.pros || targetObj.pros;
     targetObj.cons = result.cons || targetObj.cons;
+    if (result.publicIntel && result.publicIntel !== '—') targetObj.publicIntel = result.publicIntel;
 
     persistDatabase();
     renderMatrix();
@@ -1419,10 +1584,17 @@ async function executeIncrementalAnalysis() {
   const channel = document.getElementById("targetChannel").value;
   const speedDelta = document.getElementById("deltaManualInput").value.trim();
   const closingBehavior = document.getElementById("closingSelect").value;
-  const userNotes = document.getElementById("dialogTranscriptInput").value.trim();
+  let userNotes = document.getElementById("dialogTranscriptInput").value.trim();
 
   if (!name) { alert("Укажите имя!"); return; }
-  if (!activePickedFile && !userNotes) { alert("Вставьте скриншот (Ctrl+V), загрузите аудио/КП или введите текст диалога."); return; }
+
+  // Если материал не прикреплен и текст не введен — запускаем разведку
+  if (!activePickedFile && !userNotes) {
+    const confirmWeb = confirm(`Текст переписки не введен. Запустить поиск данных о компании «${name}» в открытых источниках и отзывах?`);
+    if (!confirmWeb) return;
+    await executePublicIntelligence(currentEditingSubjectId, name);
+    return;
+  }
 
   const proj = getActiveProject();
   const isOurCompany = currentSubjectType === 'our';
@@ -1432,7 +1604,7 @@ async function executeIncrementalAnalysis() {
   submitBtn.disabled = true;
 
   try {
-    setStatus("🤖 AI-анализ скриншотов / материалов...", "loading");
+    setStatus("🤖 AI-анализ материалов...", "loading");
 
     let promptText = `Ты — строгий коммерческий аудитор продаж, эксперт по ценообразованию и маркетинговому бенчмаркингу в сфере "${proj.niche}".
 ОБЪЕКТ АУДИТА: ${isOurCompany ? 'НАША СОБСТВЕННАЯ КОМПАНИЯ (Аудит реального разговора/скриншота/КП нашего менеджера)' : `КОНКУРЕНТ "${name}"`}.
@@ -1448,7 +1620,8 @@ async function executeIncrementalAnalysis() {
 7. "delivery": Сроки поставки, гарантии, Incoterms.
 8. "score": Объективная оценка мастерства от 1 до 10.
 9. "pros": Реальные сильные фишки.
-10. "cons": Грубые ошибки, упущенные вопросы и слабые места.`;
+10. "cons": Грубые ошибки, упущенные вопросы и слабые места.
+11. "extractedDialogue": Дословная стенограмма или краткая выжимка разговора/переписки для сохранения в память досье.`;
 
     if (isOurCompany) {
       promptText += `\n\nТЕКУЩЕЕ ДОСЬЕ НАШЕЙ КОМПАНИИ:\n${JSON.stringify(proj.ourCompany, null, 2)}
@@ -1471,19 +1644,26 @@ async function executeIncrementalAnalysis() {
   "recalled": "Повторные касания: как часто пишут/звонят повторно",
   "score": "7",
   "pros": "Сильные стороны",
-  "cons": "Слабые места, риски, ошибки"
+  "cons": "Слабые места, риски, ошибки",
+  "extractedDialogue": "Краткая стенограмма разговора/переписки"
 }`;
 
     let userContent = [{ type: "text", text: promptText }];
     if (userNotes) userContent.push({ type: "text", text: `Заметки / Текст диалога:\n${userNotes}` });
 
+    let fileNameSaved = "Текст диалога";
+    let fileTypeSaved = "Текст";
+
     if (activePickedFile) {
+      fileNameSaved = activePickedFile.name;
       const { b64, mime } = await fileToBase64Data(activePickedFile);
       const ext = activePickedFile.name.split('.').pop().toLowerCase();
       if (activePickedFile.type.startsWith('audio/') || ['mp3', 'wav', 'm4a', 'ogg', 'aac', 'flac'].includes(ext)) {
+        fileTypeSaved = "Аудио звонка";
         const audioFormat = ext === 'wav' ? 'wav' : (ext === 'm4a' ? 'm4a' : 'mp3');
         userContent.push({ type: "input_audio", input_audio: { data: b64, format: audioFormat } });
       } else {
+        fileTypeSaved = activePickedFile.type.startsWith('image/') ? "Скриншот" : "Документ";
         userContent.push({ type: "image_url", image_url: { url: `data:${mime};base64,${b64}` } });
       }
     }
@@ -1507,7 +1687,18 @@ async function executeIncrementalAnalysis() {
     const speedDisplay = speedDelta ? `${speedDelta} (${channel})` : (result.speed || channel);
     const recalledDisplay = (closingBehavior !== 'auto') ? closingBehavior : (result.closing ? `${result.closing} / ${result.recalled || ''}` : (result.recalled || 'По переписке'));
 
+    // Формируем запись в историю материалов
+    const materialRecord = {
+      name: fileNameSaved,
+      type: fileTypeSaved,
+      time: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString().slice(0,5),
+      content: result.extractedDialogue || userNotes || result.offer,
+      icon: fileTypeSaved === 'Аудио звонка' ? '🎙️' : (fileTypeSaved === 'Скриншот' ? '📸' : '📄')
+    };
+
     if (isOurCompany) {
+      if (!proj.ourCompany.materialsLog) proj.ourCompany.materialsLog = [];
+      proj.ourCompany.materialsLog.unshift(materialRecord);
       proj.ourCompany.speed = speedDisplay;
       proj.ourCompany.offer = result.offer || proj.ourCompany.offer;
       proj.ourCompany.price = result.price || proj.ourCompany.price;
@@ -1520,6 +1711,8 @@ async function executeIncrementalAnalysis() {
       proj.ourCompany.pros = result.pros || proj.ourCompany.pros;
       proj.ourCompany.cons = result.cons || proj.ourCompany.cons;
     } else if (existingSub) {
+      if (!existingSub.materialsLog) existingSub.materialsLog = [];
+      existingSub.materialsLog.unshift(materialRecord);
       existingSub.speed = speedDisplay;
       existingSub.offer = result.offer || existingSub.offer;
       existingSub.price = result.price || existingSub.price;
@@ -1546,7 +1739,9 @@ async function executeIncrementalAnalysis() {
         closing: result.closing || "—",
         score: String(result.score || "7"),
         pros: result.pros || "—",
-        cons: result.cons || "—"
+        cons: result.cons || "—",
+        publicIntel: "—",
+        materialsLog: [materialRecord]
       });
     }
 
@@ -1555,7 +1750,7 @@ async function executeIncrementalAnalysis() {
     renderMatrix();
     renderProjectsTabs();
 
-    setStatus("Успешно проанализировано и сохранено!", "success");
+    setStatus("Успешно проанализировано и сохранено в память!", "success");
     setTimeout(() => setStatus(null), 3000);
     resetFormToNew();
 
@@ -1584,14 +1779,16 @@ function renderMatrix() {
   proj.evaluatedList.forEach((sub, sIdx) => {
     const th = document.createElement("th");
     th.className = "comp-col";
+    const materialsCount = (sub.materialsLog || []).length;
     th.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         <div>
           <div style="font-weight:700; font-size:13px;">${escapeHtml(sub.name)}</div>
-          <div style="font-size:10px; opacity:0.8; margin-top:2px;">🎯 Конкурент</div>
+          <div style="font-size:10px; opacity:0.8; margin-top:2px;">🎯 Конкурент ${materialsCount ? `• 📂 ${materialsCount}` : ''}</div>
         </div>
         <div style="display:flex; gap:3px; margin-left:4px;">
-          <button class="btn btn-purple btn-xs" title="Разобрать сохраненный текст через ИИ" onclick="analyzeExistingCompetitor('${sub.id}')">⚡ ИИ</button>
+          <button class="btn btn-purple btn-xs" title="Разобрать сохраненные звонки/переписку через ИИ" onclick="analyzeExistingCompetitor('${sub.id}')">⚡ ИИ</button>
+          <button class="btn btn-cyan btn-xs" title="Собрать досье по сайту и отзывам" onclick="executePublicIntelligence('${sub.id}')">🌐</button>
           <button class="btn btn-secondary btn-xs" title="Дополнить досье" onclick="loadSubjectForUpdating('${sub.id}')">✏️</button>
           <button class="btn btn-danger btn-xs" title="Удалить" onclick="removeSubject(${sIdx})">✕</button>
         </div>
@@ -1700,7 +1897,7 @@ function switchRightView(view) {
   document.getElementById("reportViewContainer").style.display = view === 'report' ? 'block' : 'none';
 }
 
-// --- СТРАТЕГИЧЕСКИЙ АУДИТ + ПЕРСОНАЛЬНЫЕ РЕКОМЕНДАЦИИ ---
+// --- СТРАТЕГИЧЕСКИЙ АУДИТ (ЗВОНКИ + СМЕТЫ + ОТКРЫТЫЕ ИСТОЧНИКИ) ---
 async function generateStrategicReport() {
   const proj = getActiveProject();
   if (!proj.evaluatedList.length) {
@@ -1715,13 +1912,13 @@ async function generateStrategicReport() {
   const reportContainer = document.getElementById("strategicReportContent");
   const btn = document.getElementById("genReportBtn");
   btn.disabled = true;
-  reportContainer.innerHTML = "⏳ ИИ формирует глубокий стратегический аудит рынка, сравнивает реальную работу нашего менеджера с конкурентами и готовит рекомендации...";
+  reportContainer.innerHTML = "⏳ ИИ формирует глубокий стратегический аудит рынка (анализирует ценообразование, аудиозвонки, договоры, жалобы клиентов из сети)...";
 
   try {
     const prompt = `Ты — коммерческий директор и директор по маркетингу с 10-летним стажем в B2B и логистике (ВЭД с Китаем).
-Проанализируй РЕАЛЬНЫЕ собранные данные аудита звонков, скриншотов переписок и смет:
+Проанализируй РЕАЛЬНЫЕ собранные данные аудита звонков, скриншотов переписок, смет и разведки из открытых источников:
 НИША: "${proj.niche}"
-СПИСОК КОНКУРЕНТОВ И ИХ ДАННЫЕ:
+СПИСОК КОНКУРЕНТОВ И ИХ ДАННЫЕ (включая репутацию и отзывы из сети):
 ${JSON.stringify(proj.evaluatedList, null, 2)}
 
 ${isWithUs ? `РЕАЛЬНЫЕ ДАННЫЕ НАШЕЙ КОМПАНИИ (исходя из аудита звонка/КП нашего менеджера):\n${JSON.stringify(proj.ourCompany, null, 2)}` : 'Анализ проводится БЕЗ участия нашей компании (чистый объективный срез рынка).' }
@@ -1738,30 +1935,34 @@ ${isWithUs ? `РЕАЛЬНЫЕ ДАННЫЕ НАШЕЙ КОМПАНИИ (исх�
 - Детальный разбор условий: кто берет на себя риски задержки, простоев на границе, конфискации или боя груза, а кто перекладывает это на клиента.
 - Насколько прозрачны присылаемые ими сметы/счета.
 
-<h3>3. Зрелость и ошибки отделов продаж</h3>
+<h3>3. Репутационный фон и реальные боли клиентов из открытых источников</h3>
+- На что чаще всего жалуются реальные заказчики этих компаний на форумах и отзовиках (срыв сроков, изменение цены после забора груза, плохая упаковка, потеря связности).
+- Как использовать этот репутационный негатив в наших переговорах.
+
+<h3>4. Зрелость и ошибки отделов продаж</h3>
 - Оценка скорости (Speed-to-Lead): кто перезванивает за 5 минут, а кто сливает лиды часами.
 - Оценка квалификации: выявляют ли реальную задачу клиента или просто выкатывают сухой расчет.
 - Оценка дожима: какие триггеры используют (скидка, дедлайн, бронирование места) или бросают клиента после отправки КП.
 
 ${isWithUs ? `
 <div class="recommendation-box">
-  <h4>🎯 4. ПЕРСОНАЛЬНЫЕ РЕКОМЕНДАЦИИ И ТОЧКИ РОСТА ДЛЯ НАШЕЙ КОМПАНИИ</h4>
+  <h4>🎯 5. ПЕРСОНАЛЬНЫЕ РЕКОМЕНДАЦИИ И ТОЧКИ РОСТА ДЛЯ НАШЕЙ КОМПАНИИ</h4>
   <p><strong>1. Аудит реальной работы нашего менеджера:</strong> честное сравнение: где наш менеджер уступил конкурентам (в скорости, в вопросах выявления болей, в отработке возражения "дорого", в дожиме)? Какие критические ошибки допущены?</p>
   <p><strong>2. Коррекция нашего КП и условий:</strong> что конкретно переделать в нашем коммерческом предложении / счёте, чтобы оно выгодно отличалось от КП конкурентов (какие скрытые платежи конкурентов подсветить клиенту)?</p>
   <p><strong>3. Скриптовые заготовки для нашего отдела продаж:</strong> конкретные формулировки вопросов и речевые модули, которые наш менеджер должен говорить при звонке клиенту.</p>
   <p><strong>4. Quick Wins (Быстрые победы):</strong> 3 конкретных действия, которые поднимут нашу конверсию в закрытые сделки уже на этой неделе.</p>
 </div>
 
-<h3>5. Тактические карты контр-игры (Battle Cards против каждого конкурента)</h3>
+<h3>6. Тактические карты контр-игры (Battle Cards против каждого конкурента)</h3>
 Создай для каждого исследованного конкурента отдельный блок:
 <div class="battle-card">
   <div class="battle-card-title">Против конкурента: [Название]</div>
   <p><strong>Их ключевой крючок:</strong> [чем они заманивают клиента]</p>
-  <p><strong>Их уязвимость / скрытый подвох:</strong> [в чем реальный минус их схемы: переплата, сроки, риск]</p>
+  <p><strong>Их уязвимость / скрытый подвох (из звонков и отзывов):</strong> [в чем реальный минус их схемы: переплата, сроки, риск]</p>
   <div class="script-quote"><strong>Убийственный вопрос нашего менеджера клиенту:</strong> «[Точная фраза, которую менеджер говорит клиенту, чтобы дискредитировать предложение этого конкурента без прямого оскорбления]»</div>
 </div>
 ` : `
-<h3>4. Карта сегментации рынка и свободные ниши</h3>
+<h3>5. Карта сегментации рынка и свободные ниши</h3>
 - Распределение игроков: Лоукостеры / Эксперты / Премиум.
 - В чем главная незакрытая боль клиентов в этой нише, которую не решает ни один из проверенных игроков.
 `}
@@ -1888,7 +2089,7 @@ function saveSettings() {
     model: document.getElementById("cfgModel").value.trim(),
     cloudUrl: document.getElementById("cfgCloudUrl").value.trim()
   };
-  localStorage.setItem("speshu_cfg_v14", JSON.stringify(c));
+  localStorage.setItem("speshu_cfg_v16", JSON.stringify(c));
   closeSettingsModal();
   syncWithCloud();
 }
