@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>КонкурентСкан Pro — Маркетинговый бенчмаркинг и аудит продаж</title>
-  <!-- Сжатие данных в URL для мгновенного обмена с коллегами без сервера -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
   <style>
     :root {
@@ -40,7 +39,6 @@
     .brand p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
-    /* Табы проектов */
     .projects-bar {
       display: flex;
       align-items: center;
@@ -137,7 +135,6 @@
     input:focus, select:focus, textarea:focus { border-color: var(--accent); }
     textarea { resize: vertical; min-height: 65px; }
 
-    /* Панель выбора режима */
     .mode-tabs-container {
       background: rgba(11, 17, 32, 0.9);
       border: 1px solid var(--card-border);
@@ -167,7 +164,6 @@
     .input-with-action { display: flex; gap: 4px; }
     .input-with-action input { flex: 1; }
 
-    /* Таблица матрицы */
     .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid var(--card-border); }
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
     th, td { padding: 9px 11px; border-bottom: 1px solid var(--card-border); border-right: 1px solid var(--card-border); vertical-align: top; }
@@ -204,7 +200,6 @@
     }
     .view-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    /* Стили глубокого отчёта маркетолога */
     .report-card {
       background: #080d1a;
       border: 1px solid #1e293b;
@@ -217,7 +212,6 @@
     }
     .report-card h2 { color: #60a5fa; font-size: 18px; margin-bottom: 12px; border-bottom: 2px solid #1e293b; padding-bottom: 6px; }
     .report-card h3 { color: #93c5fd; margin-top: 18px; margin-bottom: 8px; font-size: 15px; border-left: 3px solid #3b82f6; padding-left: 8px; }
-    .report-card h4 { color: #fde047; font-size: 13px; margin-top: 12px; margin-bottom: 4px; }
     .report-card ul { margin-left: 20px; margin-bottom: 10px; }
     .report-card li { margin-bottom: 5px; }
     .report-card strong { color: #fff; font-weight: 600; }
@@ -255,7 +249,6 @@
       <p>Бенчмаркинг офферов, аудит документов/звонков и стратегическая разведка</p>
     </div>
     <div class="header-actions">
-      <!-- ГЛАВНАЯ КНОПКА СОВМЕСТНОГО ДОСТУПА -->
       <button class="btn btn-purple" onclick="openShareModal()">🔗 Поделиться ссылкой (для коллеги)</button>
       <button class="btn btn-secondary" onclick="exportDatabaseJSON()">📁 Бэкап (JSON)</button>
       <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Загрузить JSON</button>
@@ -266,7 +259,6 @@
     </div>
   </header>
 
-  <!-- Вкладки проектов -->
   <div class="projects-bar" id="projectsBar"></div>
 
   <div class="main-grid">
@@ -278,7 +270,6 @@
           <span id="scanStatus" class="status-msg"></span>
         </div>
 
-        <!-- Режимы: Новый vs Дозаполнение -->
         <div class="mode-tabs-container">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <div id="currentModeBadge" class="mode-badge mode-badge-new">➕ Создание НОВОГО конкурента</div>
@@ -328,7 +319,6 @@
           </div>
         </div>
 
-        <!-- Фиксация времени -->
         <div style="background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 12px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <label style="margin: 0; color: #93c5fd;">⏱️ Время подачи и первого ответа</label>
@@ -356,7 +346,6 @@
           </div>
         </div>
 
-        <!-- Заявки в ожидании -->
         <div id="pendingContainer" style="display: none; margin-bottom: 12px;">
           <div style="font-size: 11px; font-weight: 700; color: var(--warning); margin-bottom: 4px;">
             ⏳ Ожидают ответа (<span id="pendingCount">0</span>):
@@ -364,7 +353,6 @@
           <div id="pendingList"></div>
         </div>
 
-        <!-- Загрузка материалов -->
         <div class="form-group" style="background: rgba(37,99,235,0.06); border: 1px dashed #3b82f6; border-radius: 8px; padding: 10px;">
           <label style="color: #93c5fd;">📎 Загрузить материал (Аудио звонка, PDF-счёт, КП, скан)</label>
           <input type="file" id="materialFileInput" accept="audio/*,application/pdf,image/*" onchange="handleMaterialPick(this)">
@@ -376,18 +364,16 @@
           <textarea id="dialogTranscriptInput" placeholder="Вставьте переписку, детали звонка, спецификацию или комментарии..."></textarea>
         </div>
 
-        <!-- КНОПКИ ДЕЙСТВИЯ -->
         <div style="display: flex; gap: 8px;">
-          <button type="button" id="submitAuditBtn" class="btn" style="flex: 2; justify-content: center; padding: 11px;" onclick="executeIncrementalAnalysis()">
+          <button type="button" id="submitAuditBtn" class="btn" style="flex: 2; justify-content: center; padding: 11px; font-size: 13px;" onclick="executeIncrementalAnalysis()">
             🤖 Запустить AI-анализ и обновить
           </button>
           <button type="button" class="btn btn-success" style="flex: 1; justify-content: center; padding: 11px;" onclick="manualSaveSubjectCard()">
-            💾 Сохранить карточку
+            💾 Сохранить
           </button>
         </div>
       </div>
 
-      <!-- Эталон Нашей компании -->
       <div class="card" id="ourCompanySettingsCard">
         <div class="card-title">
           <span>🏢 Параметры НАШЕЙ компании (Эталон)</span>
@@ -424,7 +410,6 @@
           </div>
         </div>
 
-        <!-- Вид 1: Матрица -->
         <div id="matrixViewContainer">
           <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
             💡 Кликните по любой ячейке таблицы, чтобы отредактировать. Изменения сохраняются автоматически.
@@ -442,7 +427,6 @@
           </div>
         </div>
 
-        <!-- Вид 2: Стратегический анализ -->
         <div id="reportViewContainer" style="display: none;">
           <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.8); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); flex-wrap: wrap; gap: 8px;">
             <div>
@@ -584,7 +568,6 @@ function getActiveProject() {
 }
 
 function initApp() {
-  // 1. Проверяем наличие входящей ссылки с данными от коллеги
   if (window.location.hash.startsWith('#data=')) {
     try {
       const compressed = window.location.hash.slice(6);
@@ -594,7 +577,6 @@ function initApp() {
         if (imported.projects) {
           globalDatabase = imported;
           persistDatabase();
-          // Очищаем хэш в строке браузера, чтобы не перегружать URL
           history.replaceState(null, null, window.location.pathname);
           alert("🎉 Данные успешно загружены из ссылки коллеги! Все конкуренты и расчеты обновлены.");
         }
@@ -604,13 +586,12 @@ function initApp() {
     }
   }
 
-  // 2. Читаем локальную память браузера
-  const savedDb = localStorage.getItem("speshu_master_db_v8");
+  const savedDb = localStorage.getItem("speshu_master_db_v9");
   if (savedDb) {
     try { globalDatabase = JSON.parse(savedDb); } catch(e){}
   }
 
-  const savedCfg = localStorage.getItem("speshu_cfg_v8");
+  const savedCfg = localStorage.getItem("speshu_cfg_v9");
   if (savedCfg) {
     try {
       const c = JSON.parse(savedCfg);
@@ -626,7 +607,7 @@ function initApp() {
 }
 
 function persistDatabase() {
-  localStorage.setItem("speshu_master_db_v8", JSON.stringify(globalDatabase));
+  localStorage.setItem("speshu_master_db_v9", JSON.stringify(globalDatabase));
 }
 
 function getApiConfig() {
@@ -745,7 +726,6 @@ function loadCurrentProjectView() {
   renderMatrix();
 }
 
-// --- Управление режимом карточки (Новый vs Дополнение) ---
 function updateExistingSubjectsDropdown() {
   const proj = getActiveProject();
   const select = document.getElementById("existingSubjectSelect");
@@ -1015,6 +995,113 @@ function manualSaveSubjectCard() {
   resetFormToNew();
 }
 
+// =========================================================================
+// НЕУБИВАЕМЫЙ ПАРСЕР JSON И СТРУКТУРИРОВАННОГО ОТВЕТА МОДЕЛИ
+// =========================================================================
+function cleanAndParseJSON(raw) {
+  if (!raw || typeof raw !== 'string') {
+    throw new Error("Пустой ответ от сервера модели.");
+  }
+  
+  let str = raw.trim();
+  // Убираем markdown обертки ```json ... ```
+  if (str.includes('```')) {
+    str = str.replace(/^```[a-z]*\s*/i, '').replace(/\s*```$/i, '').trim();
+  }
+
+  // Попытка 1: Прямой парсинг
+  try {
+    return JSON.parse(str);
+  } catch (e) {}
+
+  // Попытка 2: Вырезаем только блок от первого { до последнего }
+  const firstBrace = str.indexOf('{');
+  const lastBrace = str.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    const jsonBlock = str.substring(firstBrace, lastBrace + 1);
+    try {
+      return JSON.parse(jsonBlock);
+    } catch (e) {}
+
+    // Попытка 3: Удаление висячих запятых перед } или ]
+    const noTrailing = jsonBlock.replace(/,\s*([}\]])/g, '$1');
+    try {
+      return JSON.parse(noTrailing);
+    } catch (e) {}
+  }
+
+  // Попытка 4: Умный Regex-парсер для извлечения полей даже при сломанных внутренних кавычках
+  const keys = ["offer", "price", "delivery", "qualification", "objections", "closing", "score", "pros", "cons"];
+  const result = {};
+  let matchedCount = 0;
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const nextKeysPattern = keys.filter(k => k !== key).join('|');
+    const reg = new RegExp(`"${key}"\\s*:\\s*"([\\s\\S]*?)(?="\\s*,\\s*"(?:${nextKeysPattern})"|"(?:\\s*\\}))`, 'i');
+    const m = str.match(reg);
+    if (m && m[1] !== undefined) {
+      result[key] = m[1].trim().replace(/\\"/g, '"').replace(/\\n/g, '\n');
+      matchedCount++;
+    }
+  }
+
+  const scoreMatch = str.match(/"score"\s*:\s*"?(\d{1,2})"?/i);
+  if (scoreMatch) {
+    result.score = scoreMatch[1];
+    matchedCount++;
+  }
+
+  if (matchedCount >= 2) {
+    keys.forEach(k => {
+      if (!result[k]) result[k] = "—";
+    });
+    if (!result.score) result.score = "7";
+    return result;
+  }
+
+  // Попытка 5: Если модель выдала текстовый формат (Оффер: ... Цена: ...)
+  const textKeys = [
+    { key: "offer", pattern: /(?:ОФФЕР|ЧТО ПРЕДЛАГАЮТ|ПРОДУКТ)[\s:]+([^\n]+(?:\n(?!ЦЕНА|СТОИМОСТЬ|ДОСТАВКА|КВАЛИФИКАЦИЯ|ВОЗРАЖЕНИЯ|ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
+    { key: "price", pattern: /(?:ЦЕНА|СТОИМОСТЬ|ТАРИФЫ)[\s:]+([^\n]+(?:\n(?!ДОСТАВКА|КВАЛИФИКАЦИЯ|ВОЗРАЖЕНИЯ|ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
+    { key: "delivery", pattern: /(?:ДОСТАВКА|УСЛОВИЯ ДОСТАВКИ|СРОКИ)[\s:]+([^\n]+(?:\n(?!КВАЛИФИКАЦИЯ|ВОЗРАЖЕНИЯ|ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
+    { key: "qualification", pattern: /(?:КВАЛИФИКАЦИЯ|ВЫЯВЛЕНИЕ ПОТРЕБНОСТЕЙ)[\s:]+([^\n]+(?:\n(?!ВОЗРАЖЕНИЯ|ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
+    { key: "objections", pattern: /(?:ВОЗРАЖЕНИЯ|ОТРАБОТКА ВОЗРАЖЕНИЙ)[\s:]+([^\n]+(?:\n(?!ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
+    { key: "closing", pattern: /(?:ДОЖИМ|ТАКТИКА ДОЖИМА)[\s:]+([^\n]+(?:\n(?!ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
+    { key: "pros", pattern: /(?:ПЛЮСЫ|СИЛЬНЫЕ СТОРОНЫ)[\s:]+([^\n]+(?:\n(?!МИНУСЫ)[^\n]+)*)/i },
+    { key: "cons", pattern: /(?:МИНУСЫ|СЛАБЫЕ СТОРОНЫ|ОШИБКИ)[\s:]+([^\n]+)/i }
+  ];
+
+  let textMatchCount = 0;
+  textKeys.forEach(tk => {
+    const tm = str.match(tk.pattern);
+    if (tm && tm[1]) {
+      result[tk.key] = tm[1].trim();
+      textMatchCount++;
+    } else if (!result[tk.key]) {
+      result[tk.key] = "—";
+    }
+  });
+
+  if (textMatchCount >= 2) {
+    if (!result.score) result.score = "7";
+    return result;
+  }
+
+  // Попытка 6: Аварийный мягкий фоллбек (сохраняем текст ответа ИИ в поле "offer", чтобы ничего не потерялось)
+  return {
+    offer: str.length > 500 ? str.slice(0, 500) + '...' : str,
+    price: "См. детали в оффере",
+    delivery: "—",
+    qualification: "—",
+    objections: "—",
+    closing: "—",
+    score: "6",
+    pros: "Данные успешно получены",
+    cons: "—"
+  };
+}
+
 // --- Выполнение AI-анализа (Создание или Обновление) ---
 async function executeIncrementalAnalysis() {
   const cfg = getApiConfig();
@@ -1059,7 +1146,8 @@ async function executeIncrementalAnalysis() {
       promptText += `\n\nПроанализируй первое касание и сформируй полное коммерческое досье.`;
     }
 
-    promptText += `\n\nВерни результат СТРОГО в формате JSON без кавычек и markdown:
+    promptText += `\n\nСТРОГОЕ ПРАВИЛО: Верни ответ ТОЛЬКО в формате JSON. Внутри значений свойств КАТЕГОРИЧЕСКИ НЕ ИСПОЛЬЗУЙ двойные кавычки " (заменяй их на 'одинарные' или «елочки»), чтобы не сломать парсер.
+Формат ответа:
 {
   "offer": "Что предлагают: состав пакета, номенклатура, состав услуг, комплектация",
   "price": "Цены, порядок оплаты, скрытые комиссии, курс валют, предоплата, условия скидок",
@@ -1067,7 +1155,7 @@ async function executeIncrementalAnalysis() {
   "qualification": "Квалификация: задавались ли открытые вопросы о задачах, бюджете, ЛПР",
   "objections": "Отработка сомнений: аргументы ценности против падения в скидку",
   "closing": "Дожим: дедлайн, CTA, договоренность о следующем шаге",
-  "score": "Итоговая оценка продаж от 1 до 10 (целое число)",
+  "score": "7",
   "pros": "Сильные стороны оффера/менеджера (что перенять)",
   "cons": "Слабые места, риски, непрозрачность (где мы сильнее)"
 }`;
@@ -1079,11 +1167,12 @@ async function executeIncrementalAnalysis() {
 
     if (activePickedFile) {
       const { b64, mime } = await fileToBase64Data(activePickedFile);
-      if (activePickedFile.type.startsWith('audio/') || activePickedFile.name.match(/\.(mp3|wav|m4a|ogg)$/i)) {
-        const ext = activePickedFile.name.split('.').pop().toLowerCase();
+      const ext = activePickedFile.name.split('.').pop().toLowerCase();
+      if (activePickedFile.type.startsWith('audio/') || ['mp3', 'wav', 'm4a', 'ogg', 'aac', 'flac'].includes(ext)) {
+        const audioFormat = ext === 'wav' ? 'wav' : (ext === 'm4a' ? 'm4a' : 'mp3');
         userContent.push({
           type: "input_audio",
-          input_audio: { data: b64, format: ext === 'wav' ? 'wav' : 'mp3' }
+          input_audio: { data: b64, format: audioFormat }
         });
       } else {
         userContent.push({
@@ -1102,8 +1191,8 @@ async function executeIncrementalAnalysis() {
       body: JSON.stringify({
         model: cfg.model,
         messages: [{ role: "user", content: userContent }],
-        response_format: { type: "json_object" },
-        temperature: 0.2
+        temperature: 0.2,
+        max_tokens: 3500
       })
     });
 
@@ -1114,14 +1203,7 @@ async function executeIncrementalAnalysis() {
 
     const data = await response.json();
     const raw = data.choices[0].message.content;
-    let result;
-    try {
-      result = JSON.parse(raw);
-    } catch(e) {
-      const m = raw.match(/\{[\s\S]*\}/);
-      if (m) result = JSON.parse(m[0]);
-      else throw new Error("Не удалось разобрать JSON.");
-    }
+    const result = cleanAndParseJSON(raw);
 
     const speedDisplay = speedDelta ? `${speedDelta} (${channel})` : channel;
     const recalledDisplay = closingBehavior;
@@ -1398,7 +1480,6 @@ ${isWithUs ? `
   }
 }
 
-// Фиксация отчета в проект
 function saveCurrentReportText() {
   const proj = getActiveProject();
   const html = document.getElementById("strategicReportContent").innerHTML;
@@ -1415,7 +1496,6 @@ function printReport() {
   win.print();
 }
 
-// --- Бэкап и Экспорт ---
 function exportDatabaseJSON() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalDatabase, null, 2));
   const link = document.createElement("a");
@@ -1484,6 +1564,7 @@ function exportToExcel() {
   CRITERIA.forEach(crit => {
     html += `<tr><td><strong>${escapeHtml(crit.label)}</strong></td>`;
     if (proj.showOurCompany) html += `<td style="background:#f0fdf4;">${escapeHtml(proj.ourStandard[crit.key] || "")}</td>`;
+    appState = proj;
     proj.evaluatedList.forEach(s => {
       html += `<td>${escapeHtml(s[crit.key] || "")}</td>`;
     });
@@ -1521,7 +1602,7 @@ function saveSettings() {
     apiBase: document.getElementById("cfgApiBase").value.trim(),
     model: document.getElementById("cfgModel").value.trim()
   };
-  localStorage.setItem("speshu_cfg_v8", JSON.stringify(c));
+  localStorage.setItem("speshu_cfg_v9", JSON.stringify(c));
   closeSettingsModal();
 }
 
