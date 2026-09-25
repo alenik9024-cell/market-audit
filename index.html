@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>КонкурентСкан Pro — Маркетинговый бенчмаркинг и аудит продаж</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131c2e;
+      --card-border: #22324e;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --input-bg: #0a0f1d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; }
+    .container { max-width: 1680px; margin: 0 auto; }
+
+    /* Верхняя панель и проекты */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand h1 { font-size: 20px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .brand p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+    /* Табы проектов */
+    .projects-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .project-tab {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .project-tab.active {
+      background: rgba(37, 99, 235, 0.25);
+      border-color: var(--accent);
+      color: #93c5fd;
+    }
+    .project-tab .tab-close {
+      color: #f87171;
+      font-size: 12px;
+      opacity: 0.6;
+    }
+    .project-tab .tab-close:hover { opacity: 1; }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-secondary { background: var(--card-border); color: var(--text); }
+    .btn-secondary:hover { background: #334668; }
+    .btn-success { background: var(--success); }
+    .btn-purple { background: var(--purple); }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+    .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 4px; }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 500px 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 1240px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group { margin-bottom: 10px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    
+    input, select, textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 70px; }
+
+    /* Переключатель типа */
+    .type-switcher { display: flex; gap: 6px; margin-bottom: 12px; }
+    .type-btn {
+      flex: 1; padding: 7px; background: var(--input-bg); border: 1px solid var(--card-border);
+      border-radius: 6px; color: var(--text-muted); cursor: pointer; font-size: 12px; font-weight: 600; text-align: center;
+    }
+    .type-btn.active.comp { background: rgba(37, 99, 235, 0.25); border-color: var(--accent); color: #93c5fd; }
+    .type-btn.active.internal { background: rgba(139, 92, 246, 0.25); border-color: var(--purple); color: #c4b5fd; }
+
+    .input-with-action { display: flex; gap: 4px; }
+    .input-with-action input { flex: 1; }
+
+    /* Таблица матрицы */
+    .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid var(--card-border); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 9px 11px; border-bottom: 1px solid var(--card-border); border-right: 1px solid var(--card-border); vertical-align: top; }
+    th { background: #111827; color: #cbd5e1; font-weight: 600; position: sticky; top: 0; }
+    th.crit-col { width: 170px; min-width: 170px; background: #0c121e; }
+    th.our-col { width: 230px; min-width: 230px; background: #064e3b; color: #a7f3d0; }
+    td.our-cell { background: rgba(6, 78, 59, 0.15); }
+    th.comp-col { width: 240px; min-width: 240px; }
+    th.internal-col { width: 240px; min-width: 240px; background: #4c1d95; color: #ddd6fe; }
+    td.internal-cell { background: rgba(139, 92, 246, 0.1); }
+    
+    .editable-cell { outline: none; padding: 3px; border-radius: 4px; white-space: pre-wrap; word-break: break-word; }
+    .editable-cell:focus { background: rgba(37, 99, 235, 0.2); }
+
+    .score-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; }
+    .score-green { background: #065f46; color: #34d399; }
+    .score-yellow { background: #854d0e; color: #fde047; }
+    .score-red { background: #7f1d1d; color: #f87171; }
+
+    .status-msg { font-size: 11px; padding: 3px 6px; border-radius: 4px; display: none; }
+    .status-loading { background: rgba(245, 158, 11, 0.2); color: #fde047; display: inline-block; }
+    .status-error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; display: inline-block; }
+    .status-success { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; display: inline-block; }
+
+    /* Очередь заявок */
+    .queue-item {
+      background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 6px;
+      padding: 8px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;
+    }
+
+    /* Вкладки правой панели: Матрица / Стратегический отчет */
+    .view-switcher { display: flex; gap: 6px; margin-bottom: 12px; }
+    .view-btn {
+      padding: 8px 14px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 6px;
+      color: var(--text-muted); cursor: pointer; font-size: 13px; font-weight: 600;
+    }
+    .view-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* Стили стратегического отчета */
+    .report-card {
+      background: #0b1220; border: 1px solid #1e293b; border-radius: 8px; padding: 18px; margin-top: 10px;
+      line-height: 1.6; font-size: 13px; color: #cbd5e1;
+    }
+    .report-card h3 { color: #93c5fd; margin-top: 14px; margin-bottom: 6px; font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px; }
+    .report-card ul { margin-left: 20px; margin-bottom: 10px; }
+    .report-card strong { color: #fff; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; width: 500px; max-width: 90vw; padding: 22px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="brand">
+      <h1>⚡ КонкурентСкан Pro</h1>
+      <p>Бенчмаркинг офферов, аудит документов/звонков и стратегическая разведка</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="exportDatabaseJSON()">📁 Бэкап (JSON)</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Загрузить JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importDatabaseJSON(this)">
+      <button class="btn btn-secondary" onclick="openSettingsModal()">⚙️ Настройки API</button>
+      <button class="btn btn-secondary" onclick="exportToCSV()">📄 CSV</button>
+      <button class="btn btn-success" onclick="exportToExcel()">📊 Excel</button>
+    </div>
+  </header>
+
+  <!-- Вкладки независимых анализов (Проектов) -->
+  <div class="projects-bar" id="projectsBar"></div>
+
+  <div class="main-grid">
+    <!-- Левая колонка: форма ввода, загрузка КП/аудио и эталон -->
+    <div>
+      <div class="card">
+        <div class="card-title">
+          <span>➕ Добавить / Дополнить досье</span>
+          <span id="scanStatus" class="status-msg"></span>
+        </div>
+
+        <label>Кого проверяем:</label>
+        <div class="type-switcher">
+          <div class="type-btn active comp" id="typeCompBtn" onclick="switchSubjectType('comp')">
+            🎯 Конкурент
+          </div>
+          <div class="type-btn internal" id="typeInternalBtn" onclick="switchSubjectType('internal')">
+            🏢 Наш менеджер (Контроль)
+          </div>
+        </div>
+
+        <!-- Выбор существующего для добавления новой информации или ввод нового -->
+        <div class="form-group">
+          <label id="subjectNameLabel">Имя / Компания (выберите из базы или впишите нового)</label>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="targetName" list="existingCompetitorsList" placeholder="например: Конкурент Альфа или chinatoday.ru" onchange="loadExistingSubjectData(this.value)">
+            <datalist id="existingCompetitorsList"></datalist>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Канал коммуникации</label>
+            <select id="targetChannel">
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Звонок менеджеру">Звонок менеджеру</option>
+              <option value="Форма на сайте">Форма на сайте</option>
+              <option value="Telegram">Telegram</option>
+              <option value="Email">Email</option>
+              <option value="КП / Счёт">КП / Счёт / Документ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Поведение при закрытии</label>
+            <select id="closingSelect">
+              <option value="Активный дожим (CTA + дедлайн)">Активный дожим (CTA + дедлайн)</option>
+              <option value="Пассивный (просто сбросили КП)">Пассивный (просто сбросили КП)</option>
+              <option value="Бросили клиента без шага">Бросили клиента без шага</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Блок фиксации времени -->
+        <div style="background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="margin: 0; color: #93c5fd;">⏱️ Время и скорость ответа</label>
+            <button type="button" class="btn btn-secondary btn-xs" onclick="parkLeadToWaiting()">📌 В ожидание</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom: 4px;">
+              <label>Подача заявки</label>
+              <div class="input-with-action">
+                <input type="text" id="reqTimeInput" placeholder="10:00 или 14.53" oninput="autoCalculateDelta()">
+                <button type="button" class="btn btn-secondary btn-xs" onclick="setNowTime('reqTimeInput')">Сейчас</button>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 4px;">
+              <label>Первичный ответ</label>
+              <div class="input-with-action">
+                <input type="text" id="respTimeInput" placeholder="10:47 или 14.58" oninput="autoCalculateDelta()">
+                <button type="button" class="btn btn-secondary btn-xs" onclick="setNowTime('respTimeInput')">Сейчас</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label>Скорость ответа (Разница)</label>
+            <input type="text" id="deltaManualInput" placeholder="например: 5 мин / 2 часа / не ответили">
+          </div>
+        </div>
+
+        <!-- Заявки в ожидании -->
+        <div id="pendingContainer" style="display: none; margin-bottom: 12px;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--warning); margin-bottom: 4px;">
+            ⏳ Ожидают ответа (<span id="pendingCount">0</span>):
+          </div>
+          <div id="pendingList"></div>
+        </div>
+
+        <!-- Загрузка файлов (Аудио, КП, Счета, Прайсы) -->
+        <div class="form-group" style="background: rgba(37,99,235,0.06); border: 1px dashed #3b82f6; border-radius: 8px; padding: 10px;">
+          <label style="color: #93c5fd;">📎 Загрузить материал (Аудиозапись, PDF-КП, Счёт, Скан)</label>
+          <input type="file" id="materialFileInput" accept="audio/*,application/pdf,image/*" onchange="handleMaterialPick(this)">
+          <div id="materialFileInfo" style="font-size: 11px; color: #93c5fd; margin-top: 4px;"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Текст диалога / заметки / доп. инфо по касанию</label>
+          <textarea id="dialogTranscriptInput" placeholder="Вставьте переписку, комментарии или выдержки из разговора..."></textarea>
+        </div>
+
+        <button type="button" id="submitAuditBtn" class="btn" style="width: 100%; justify-content: center; padding: 10px;" onclick="executeIncrementalAnalysis()">
+          🤖 Запустить AI-аудит (Дополнить досье)
+        </button>
+      </div>
+
+      <!-- Эталон Нашей компании -->
+      <div class="card" id="ourCompanySettingsCard">
+        <div class="card-title">
+          <span>🏢 Параметры НАШЕЙ компании (Эталон)</span>
+          <button class="btn btn-secondary btn-xs" onclick="saveOurStandard()">Сохранить</button>
+        </div>
+        <div class="form-group">
+          <label>Наш оффер / УТП</label>
+          <input type="text" id="ourStdOffer" placeholder="Комплекс «под ключ» с финансовой гарантией">
+        </div>
+        <div class="form-group">
+          <label>Наша цена / Порядок оплаты</label>
+          <input type="text" id="ourStdPrice" placeholder="От 50 000 ₽, фикс. смета, рассрочка 0%">
+        </div>
+        <div class="form-group">
+          <label>Условия поставки / Сроки</label>
+          <input type="text" id="ourStdDelivery" placeholder="Старт за 24 часа, доставка 15-25 дней">
+        </div>
+      </div>
+    </div>
+
+    <!-- Правая колонка: Матрица и Стратегический отчет -->
+    <div>
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div class="view-switcher">
+            <button class="view-btn active" id="viewMatrixBtn" onclick="switchRightView('matrix')">📊 Сводная матрица</button>
+            <button class="view-btn" id="viewReportBtn" onclick="switchRightView('report')">🧠 Стратегический анализ маркетолога</button>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; text-transform: none;">
+              <input type="checkbox" id="showOurColToggle" checked onchange="toggleOurColumn(this.checked)"> Колонка «Наша компания»
+            </label>
+            <button class="btn btn-danger btn-xs" onclick="clearCurrentProjectMatrix()">Очистить проект</button>
+          </div>
+        </div>
+
+        <!-- Вид 1: Матрица -->
+        <div id="matrixViewContainer">
+          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
+            💡 Кликните по любой ячейке таблицы, чтобы отредактировать. Изменения сохраняются автоматически.
+          </p>
+          <div class="table-container">
+            <table id="matrixTable">
+              <thead>
+                <tr id="matrixHeader">
+                  <th class="crit-col">Критерий оценки</th>
+                  <th class="our-col" id="ourCompanyTh">НАША КОМПАНИЯ (Эталон)</th>
+                </tr>
+              </thead>
+              <tbody id="matrixBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Вид 2: Стратегический анализ -->
+        <div id="reportViewContainer" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+            <div>
+              <span style="font-size: 13px; font-weight: 700; color: #93c5fd;">Режим формирования выводов:</span>
+              <div style="display: inline-flex; margin-left: 10px; gap: 6px;">
+                <label style="font-size: 12px; cursor: pointer; text-transform: none;">
+                  <input type="radio" name="reportMode" value="with_us" checked> В сравнении с Нашей компанией
+                </label>
+                <label style="font-size: 12px; cursor: pointer; text-transform: none; margin-left: 10px;">
+                  <input type="radio" name="reportMode" value="pure_market"> Чистый срез рынка (без нашей компании)
+                </label>
+              </div>
+            </div>
+            <button class="btn btn-purple btn-xs" id="genReportBtn" onclick="generateStrategicReport()">⚡ Сформировать аудит</button>
+          </div>
+
+          <div id="strategicReportContent" class="report-card">
+            Нажмите кнопку «Сформировать аудит», чтобы запустить комплексный маркетинговый анализ на основе накопленных данных по конкурентам.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно настроек API -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h3 style="margin-bottom: 12px;">⚙️ Настройки API SpeShu</h3>
+    
+    <div class="form-group">
+      <label>API Key</label>
+      <input type="password" id="cfgApiKey" value="sk-b32521d6-386e-4933-95e4-9104858f6bde">
+    </div>
+
+    <div class="form-group">
+      <label>Базовый URL SpeShu API</label>
+      <input type="text" id="cfgApiBase" value="https://speshu.ai/api/v1">
+    </div>
+
+    <div class="form-group">
+      <label>Экономная модель (Мультимодальная: аудио, PDF, изображения)</label>
+      <select id="cfgModelSelect" onchange="document.getElementById('cfgModel').value = this.value">
+        <option value="google/gemini-3.1-flash-lite">🔥 Gemini 3.1 Flash-Lite (~0.25 ₽ за звонок/файл — рекомендуем)</option>
+        <option value="google/gemini-3.5-flash-lite">⚡ Gemini 3.5 Flash-Lite (~0.60 ₽ за звонок/файл)</option>
+        <option value="google/gemini-3.5-flash">💎 Gemini 3.5 Flash (~1.50 ₽ за звонок/файл)</option>
+      </select>
+      <input type="text" id="cfgModel" value="google/gemini-3.1-flash-lite" style="margin-top: 6px; font-size: 11px; color: #94a3b8;">
+    </div>
+
+    <div style="display: flex; gap: 8px; margin-top: 14px; align-items: center; justify-content: space-between;">
+      <button class="btn btn-secondary btn-xs" onclick="testApiConnection()">🔍 Проверить связь и баланс</button>
+      <div style="display: flex; gap: 6px;">
+        <button class="btn btn-secondary" onclick="closeSettingsModal()">Отмена</button>
+        <button class="btn btn-success" onclick="saveSettings()">Сохранить</button>
+      </div>
+    </div>
+    <div id="apiTestResult" style="font-size: 12px; margin-top: 8px; color: #94a3b8;"></div>
+  </div>
+</div>
+
+<script>
+// --- Структура и Хранилище Проектов ---
+const CRITERIA = [
+  { key: "speed", label: "Скорость и канал первого ответа" },
+  { key: "offer", label: "Что предлагают (продукт, комплектация)" },
+  { key: "price", label: "Стоимость, тарифы, скрытые платежи" },
+  { key: "delivery", label: "Условия доставки / сроки / гарантии" },
+  { key: "recalled", label: "Перезванивают ли повторно / дожим" },
+  { key: "qualification", label: "Выявление болей и потребностей" },
+  { key: "objections", label: "Аргументы и отработка возражений" },
+  { key: "closing", label: "Тактика дожима (дедлайн, CTA)" },
+  { key: "score", label: "Оценка работы менеджера (1-10)" },
+  { key: "pros", label: "Сильные стороны (что забрать себе)" },
+  { key: "cons", label: "Слабые места (где мы сильнее)" }
+];
+
+let globalDatabase = {
+  activeProjectId: "proj_1",
+  projects: [
+    {
+      id: "proj_1",
+      name: "Основной анализ",
+      niche: "Услуги и B2B",
+      showOurCompany: true,
+      ourStandard: {
+        speed: "До 5 минут (WhatsApp / Звонок)",
+        offer: "Комплексное решение «под ключ» с гарантией",
+        price: "Фиксированная смета, без доплат, рассрочка 0%",
+        delivery: "Старт за 24 часа",
+        recalled: "Регламент 3 касаний при молчании",
+        qualification: "Выясняем задачу, бюджет, ЛПР и дедлайн",
+        objections: "Аргументация кейсами и фиксация в договоре",
+        closing: "Призыв к бесплатному аудиту / встрече",
+        score: "10",
+        pros: "Собственный штат, быстрая поддержка",
+        cons: "—"
+      },
+      pendingLeads: [],
+      evaluatedList: [],
+      savedReport: ""
+    }
+  ]
+};
+
+let currentSubjectType = "comp";
+let activePickedFile = null;
+
+function getActiveProject() {
+  return globalDatabase.projects.find(p => p.id === globalDatabase.activeProjectId) || globalDatabase.projects[0];
+}
+
+function initApp() {
+  const savedDb = localStorage.getItem("speshu_master_db_v6");
+  if (savedDb) {
+    try { globalDatabase = JSON.parse(savedDb); } catch(e){}
+  }
+
+  const savedCfg = localStorage.getItem("speshu_cfg_v6");
+  if (savedCfg) {
+    try {
+      const c = JSON.parse(savedCfg);
+      document.getElementById("cfgApiKey").value = c.apiKey || "sk-b32521d6-386e-4933-95e4-9104858f6bde";
+      document.getElementById("cfgApiBase").value = c.apiBase || "https://speshu.ai/api/v1";
+      document.getElementById("cfgModel").value = c.model || "google/gemini-3.1-flash-lite";
+      document.getElementById("cfgModelSelect").value = c.model || "google/gemini-3.1-flash-lite";
+    } catch(e){}
+  }
+
+  renderProjectsTabs();
+  loadCurrentProjectView();
+}
+
+function persistDatabase() {
+  localStorage.setItem("speshu_master_db_v6", JSON.stringify(globalDatabase));
+}
+
+function getApiConfig() {
+  return {
+    apiKey: document.getElementById("cfgApiKey").value.trim(),
+    apiBase: document.getElementById("cfgApiBase").value.trim().replace(/\/+$/, ""),
+    model: document.getElementById("cfgModel").value.trim() || "google/gemini-3.1-flash-lite"
+  };
+}
+
+// --- Управление вкладками проектов ---
+function renderProjectsTabs() {
+  const bar = document.getElementById("projectsBar");
+  bar.innerHTML = "";
+
+  globalDatabase.projects.forEach(p => {
+    const tab = document.createElement("div");
+    tab.className = `project-tab ${p.id === globalDatabase.activeProjectId ? 'active' : ''}`;
+    tab.innerHTML = `
+      <span onclick="switchProject('${p.id}')">📂 ${escapeHtml(p.name)} (${p.evaluatedList.length})</span>
+      ${globalDatabase.projects.length > 1 ? `<span class="tab-close" onclick="deleteProject('${p.id}', event)">✕</span>` : ''}
+    `;
+    bar.appendChild(tab);
+  });
+
+  const addBtn = document.createElement("button");
+  addBtn.className = "btn btn-secondary btn-xs";
+  addBtn.innerHTML = "➕ Новый анализ";
+  addBtn.onclick = createNewProject;
+  bar.appendChild(addBtn);
+}
+
+function switchProject(pId) {
+  globalDatabase.activeProjectId = pId;
+  persistDatabase();
+  renderProjectsTabs();
+  loadCurrentProjectView();
+}
+
+function createNewProject() {
+  const name = prompt("Введите название нового анализа (например: Доставка станков 2026):");
+  if (!name || !name.trim()) return;
+
+  const newProj = {
+    id: "proj_" + Date.now(),
+    name: name.trim(),
+    niche: "Услуги и B2B",
+    showOurCompany: true,
+    ourStandard: { ...globalDatabase.projects[0].ourStandard },
+    pendingLeads: [],
+    evaluatedList: [],
+    savedReport: ""
+  };
+
+  globalDatabase.projects.push(newProj);
+  globalDatabase.activeProjectId = newProj.id;
+  persistDatabase();
+  renderProjectsTabs();
+  loadCurrentProjectView();
+}
+
+function deleteProject(pId, event) {
+  event.stopPropagation();
+  if (confirm("Удалить эту вкладку со всеми накопленными конкурентами?")) {
+    globalDatabase.projects = globalDatabase.projects.filter(p => p.id !== pId);
+    if (globalDatabase.activeProjectId === pId) {
+      globalDatabase.activeProjectId = globalDatabase.projects[0].id;
+    }
+    persistDatabase();
+    renderProjectsTabs();
+    loadCurrentProjectView();
+  }
+}
+
+function loadCurrentProjectView() {
+  const proj = getActiveProject();
+  document.getElementById("showOurColToggle").checked = proj.showOurCompany;
+  document.getElementById("ourCompanySettingsCard").style.display = proj.showOurCompany ? "block" : "none";
+  document.getElementById("ourStdOffer").value = proj.ourStandard.offer || "";
+  document.getElementById("ourStdPrice").value = proj.ourStandard.price || "";
+  document.getElementById("ourStdDelivery").value = proj.ourStandard.delivery || "";
+  
+  if (proj.savedReport) {
+    document.getElementById("strategicReportContent").innerHTML = proj.savedReport;
+  } else {
+    document.getElementById("strategicReportContent").innerHTML = "Нажмите кнопку «Сформировать аудит», чтобы запустить комплексный маркетинговый анализ на основе накопленных данных по конкурентам.";
+  }
+
+  updateCompetitorDatalist();
+  renderPendingLeads();
+  renderMatrix();
+}
+
+// Автоподстановка существующих конкурентов
+function updateCompetitorDatalist() {
+  const proj = getActiveProject();
+  const datalist = document.getElementById("existingCompetitorsList");
+  datalist.innerHTML = "";
+  proj.evaluatedList.forEach(sub => {
+    const opt = document.createElement("option");
+    opt.value = sub.name;
+    datalist.appendChild(opt);
+  });
+}
+
+function loadExistingSubjectData(name) {
+  const proj = getActiveProject();
+  const found = proj.evaluatedList.find(s => s.name.toLowerCase() === name.trim().toLowerCase());
+  if (found) {
+    switchSubjectType(found.type);
+    document.getElementById("scanStatus").textContent = "Найдено досье: данные будут дополнены";
+    document.getElementById("scanStatus").className = "status-msg status-loading";
+    document.getElementById("scanStatus").style.display = "inline-block";
+    setTimeout(() => { document.getElementById("scanStatus").style.display = "none"; }, 3000);
+  }
+}
+
+// Переключение типа (Конкурент / Наш менеджер)
+function switchSubjectType(type) {
+  currentSubjectType = type;
+  document.getElementById("typeCompBtn").className = `type-btn ${type === 'comp' ? 'active comp' : ''}`;
+  document.getElementById("typeInternalBtn").className = `type-btn ${type === 'internal' ? 'active internal' : ''}`;
+}
+
+// Фиксация времени
+function setNowTime(targetInputId) {
+  const d = new Date();
+  const timeStr = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  document.getElementById(targetInputId).value = timeStr;
+  autoCalculateDelta();
+}
+
+function autoCalculateDelta() {
+  const reqVal = document.getElementById("reqTimeInput").value.trim().replace('.', ':');
+  const respVal = document.getElementById("respTimeInput").value.trim().replace('.', ':');
+  if (!reqVal || !respVal) return;
+
+  const reqMatch = reqVal.match(/(\d{1,2}):(\d{2})/);
+  const respMatch = respVal.match(/(\d{1,2}):(\d{2})/);
+
+  if (reqMatch && respMatch) {
+    const reqMins = parseInt(reqMatch[1]) * 60 + parseInt(reqMatch[2]);
+    const respMins = parseInt(respMatch[1]) * 60 + parseInt(respMatch[2]);
+    let diff = respMins - reqMins;
+    if (diff < 0) diff += 1440;
+
+    const deltaField = document.getElementById("deltaManualInput");
+    if (diff >= 60) {
+      const h = Math.floor(diff / 60);
+      const m = diff % 60;
+      deltaField.value = `${h} ч ${m} мин (${diff} мин)`;
+    } else {
+      deltaField.value = `${diff} мин`;
+    }
+  }
+}
+
+// Заявки в ожидании
+function parkLeadToWaiting() {
+  const name = document.getElementById("targetName").value.trim();
+  const channel = document.getElementById("targetChannel").value;
+  let reqTime = document.getElementById("reqTimeInput").value.trim();
+
+  if (!name) {
+    alert("Укажите имя или название компании.");
+    return;
+  }
+  if (!reqTime) {
+    setNowTime('reqTimeInput');
+    reqTime = document.getElementById("reqTimeInput").value.trim();
+  }
+
+  const proj = getActiveProject();
+  proj.pendingLeads.push({
+    id: "lead_" + Date.now(),
+    type: currentSubjectType,
+    name: name,
+    channel: channel,
+    reqTime: reqTime
+  });
+
+  persistDatabase();
+  renderPendingLeads();
+
+  document.getElementById("targetName").value = "";
+  document.getElementById("reqTimeInput").value = "";
+  document.getElementById("respTimeInput").value = "";
+  document.getElementById("deltaManualInput").value = "";
+}
+
+function renderPendingLeads() {
+  const proj = getActiveProject();
+  const container = document.getElementById("pendingContainer");
+  const list = document.getElementById("pendingList");
+  const count = document.getElementById("pendingCount");
+
+  if (!proj.pendingLeads.length) {
+    container.style.display = "none";
+    return;
+  }
+
+  container.style.display = "block";
+  count.textContent = proj.pendingLeads.length;
+  list.innerHTML = "";
+
+  proj.pendingLeads.forEach((lead, idx) => {
+    const item = document.createElement("div");
+    item.className = "queue-item";
+    const badge = lead.type === 'internal' ? '🏢 Наш' : '🎯 Конкурент';
+    item.innerHTML = `
+      <div><strong>${escapeHtml(lead.name)}</strong> <span style="font-size:10px; color:#94a3b8;">(${badge} • ${lead.channel} • в ${escapeHtml(lead.reqTime)})</span></div>
+      <div style="display:flex; gap:4px;">
+        <button class="btn btn-success btn-xs" onclick="pickPendingLead(${idx})">Ответили</button>
+        <button class="btn btn-danger btn-xs" onclick="deletePendingLead(${idx})">✕</button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function pickPendingLead(idx) {
+  const proj = getActiveProject();
+  const lead = proj.pendingLeads[idx];
+  document.getElementById("targetName").value = lead.name;
+  document.getElementById("targetChannel").value = lead.channel;
+  document.getElementById("reqTimeInput").value = lead.reqTime;
+  switchSubjectType(lead.type);
+
+  setNowTime('respTimeInput');
+  autoCalculateDelta();
+
+  proj.pendingLeads.splice(idx, 1);
+  persistDatabase();
+  renderPendingLeads();
+}
+
+function deletePendingLead(idx) {
+  const proj = getActiveProject();
+  proj.pendingLeads.splice(idx, 1);
+  persistDatabase();
+  renderPendingLeads();
+}
+
+function handleMaterialPick(input) {
+  if (input.files && input.files[0]) {
+    activePickedFile = input.files[0];
+    document.getElementById("materialFileInfo").textContent = `Файл готов: ${activePickedFile.name} (${(activePickedFile.size/1024/1024).toFixed(2)} МБ)`;
+  }
+}
+
+function setStatus(text, type) {
+  const el = document.getElementById("scanStatus");
+  if (!text) { el.style.display = "none"; return; }
+  el.className = `status-msg status-${type}`;
+  el.textContent = text;
+  el.style.display = "inline-block";
+}
+
+function fileToBase64Data(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const res = reader.result;
+      const b64 = res.includes(',') ? res.split(',')[1] : res;
+      resolve({ b64, mime: file.type || 'application/octet-stream' });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// --- Инкрементальный анализ (дополнение досье) ---
+async function executeIncrementalAnalysis() {
+  const cfg = getApiConfig();
+  if (!cfg.apiKey) {
+    alert("Укажите API-ключ в настройках ⚙️");
+    openSettingsModal();
+    return;
+  }
+
+  const name = document.getElementById("targetName").value.trim();
+  const channel = document.getElementById("targetChannel").value;
+  const speedDelta = document.getElementById("deltaManualInput").value.trim();
+  const closingBehavior = document.getElementById("closingSelect").value;
+  const userNotes = document.getElementById("dialogTranscriptInput").value.trim();
+
+  if (!name) {
+    alert("Укажите имя конкурента или сотрудника.");
+    return;
+  }
+  if (!activePickedFile && !userNotes) {
+    alert("Загрузите файл (КП, аудио, счет) или введите текст диалога/заметки.");
+    return;
+  }
+
+  const proj = getActiveProject();
+  const existingSub = proj.evaluatedList.find(s => s.name.toLowerCase() === name.toLowerCase());
+
+  const submitBtn = document.getElementById("submitAuditBtn");
+  submitBtn.disabled = true;
+
+  try {
+    setStatus("🤖 Анализ нового касания и материалов...", "loading");
+
+    const isInternal = currentSubjectType === 'internal';
+    let promptText = `Ты — ведущий эксперт по коммерческому аудиту продаж, ценообразованию и бенчмаркингу в сфере "${proj.niche}".
+Объект проверки: ${isInternal ? 'НАШ МЕНЕДЖЕР' : 'КОНКУРЕНТ'} "${name}".
+Канал: ${channel}. Зафиксированная скорость ответа: ${speedDelta || 'не указана'}. Поведение дожима: ${closingBehavior}.`;
+
+    if (existingSub) {
+      promptText += `\n\nРАНЕЕ СОБРАННЫЕ ДАННЫЕ ПО ЭТОМУ ОБЪЕКТУ:\n${JSON.stringify(existingSub, null, 2)}\n\nТвоя задача — ДОПОЛНИТЬ и УТОЧНИТЬ досье на основе новых прикрепленных материалов (КП, счетов, звонков или текста), сохранив то, что было, и актуализировав смету, цены и оценки.`;
+    } else {
+      promptText += `\n\nПроанализируй первичное касание и сформируй полное коммерческое досье.`;
+    }
+
+    promptText += `\n\nВерни результат СТРОГО в формате JSON без кавычек и markdown:
+{
+  "offer": "Что предлагают: состав пакета, модификации, номенклатура, состав услуг",
+  "price": "Цены, порядок оплаты, скрытые комиссии, курс валют, предоплата, условия скидок",
+  "delivery": "Сроки, логистика, Incoterms, гарантийные обязательства, штрафы",
+  "qualification": "Квалификация: задавались ли открытые вопросы о бюджете, ЛПР, критериях",
+  "objections": "Отработка сомнений: аргументы ценности против падения в скидку",
+  "closing": "Дожим: дедлайн, CTA, договоренность о следующем шаге",
+  "score": "Итоговая оценка продаж от 1 до 10 (целое число)",
+  "pros": "Сильные стороны оффера/менеджера (что перенять)",
+  "cons": "Слабые места, риски, непрозрачность (где мы сильнее)"
+}`;
+
+    let userContent = [{ type: "text", text: promptText }];
+    if (userNotes) {
+      userContent.push({ type: "text", text: `Заметки / Текст диалога:\n${userNotes}` });
+    }
+
+    if (activePickedFile) {
+      const { b64, mime } = await fileToBase64Data(activePickedFile);
+      if (activePickedFile.type.startsWith('audio/') || activePickedFile.name.match(/\.(mp3|wav|m4a|ogg)$/i)) {
+        const ext = activePickedFile.name.split('.').pop().toLowerCase();
+        userContent.push({
+          type: "input_audio",
+          input_audio: { data: b64, format: ext === 'wav' ? 'wav' : 'mp3' }
+        });
+      } else if (activePickedFile.type === 'application/pdf') {
+        userContent.push({
+          type: "image_url",
+          image_url: { url: `data:application/pdf;base64,${b64}` }
+        });
+      } else {
+        userContent.push({
+          type: "image_url",
+          image_url: { url: `data:${mime};base64,${b64}` }
+        });
+      }
+    }
+
+    const response = await fetch(`${cfg.apiBase}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${cfg.apiKey}`
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [{ role: "user", content: userContent }],
+        response_format: { type: "json_object" },
+        temperature: 0.2
+      })
+    });
+
+    if (!response.ok) {
+      const errTxt = await response.text();
+      throw new Error(`Ошибка API (${response.status}): ${errTxt}`);
+    }
+
+    const data = await response.json();
+    const raw = data.choices[0].message.content;
+    let result;
+    try {
+      result = JSON.parse(raw);
+    } catch(e) {
+      const m = raw.match(/\{[\s\S]*\}/);
+      if (m) result = JSON.parse(m[0]);
+      else throw new Error("Не удалось разобрать JSON.");
+    }
+
+    const speedDisplay = speedDelta ? `${speedDelta} (${channel})` : channel;
+    const recalledDisplay = closingBehavior;
+
+    if (existingSub) {
+      existingSub.offer = result.offer || existingSub.offer;
+      existingSub.price = result.price || existingSub.price;
+      existingSub.delivery = result.delivery || existingSub.delivery;
+      existingSub.qualification = result.qualification || existingSub.qualification;
+      existingSub.objections = result.objections || existingSub.objections;
+      existingSub.closing = result.closing || existingSub.closing;
+      existingSub.score = String(result.score || existingSub.score);
+      existingSub.pros = result.pros || existingSub.pros;
+      existingSub.cons = result.cons || existingSub.cons;
+      if (speedDelta) existingSub.speed = speedDisplay;
+      existingSub.recalled = recalledDisplay;
+    } else {
+      proj.evaluatedList.push({
+        id: "eval_" + Date.now(),
+        type: currentSubjectType,
+        name: name,
+        speed: speedDisplay,
+        offer: result.offer || "—",
+        price: result.price || "—",
+        delivery: result.delivery || "—",
+        recalled: recalledDisplay,
+        qualification: result.qualification || "—",
+        objections: result.objections || "—",
+        closing: result.closing || "—",
+        score: String(result.score || "7"),
+        pros: result.pros || "—",
+        cons: result.cons || "—"
+      });
+    }
+
+    persistDatabase();
+    updateCompetitorDatalist();
+    renderMatrix();
+
+    setStatus("Досье успешно обновлено!", "success");
+    setTimeout(() => setStatus(null), 3000);
+
+    // Очистка формы
+    document.getElementById("targetName").value = "";
+    document.getElementById("dialogTranscriptInput").value = "";
+    document.getElementById("reqTimeInput").value = "";
+    document.getElementById("respTimeInput").value = "";
+    document.getElementById("deltaManualInput").value = "";
+    document.getElementById("materialFileInput").value = "";
+    document.getElementById("materialFileInfo").textContent = "";
+    activePickedFile = null;
+
+  } catch (err) {
+    console.error(err);
+    alert(`Ошибка обработки: ${err.message}`);
+    setStatus("Ошибка", "error");
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+// --- Отрисовка Матрицы ---
+function renderMatrix() {
+  const proj = getActiveProject();
+  const header = document.getElementById("matrixHeader");
+  const body = document.getElementById("matrixBody");
+
+  while (header.children.length > 2) {
+    header.removeChild(header.lastChild);
+  }
+
+  const ourTh = document.getElementById("ourCompanyTh");
+  ourTh.style.display = proj.showOurCompany ? "" : "none";
+
+  proj.evaluatedList.forEach((sub, sIdx) => {
+    const th = document.createElement("th");
+    const isInternal = sub.type === 'internal';
+    th.className = isInternal ? "internal-col" : "comp-col";
+    th.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700;">${escapeHtml(sub.name)}</div>
+          <div style="font-size:10px; font-weight:normal; opacity:0.8;">${isInternal ? '🏢 Наш аудит' : '🎯 Конкурент'}</div>
+        </div>
+        <button onclick="removeSubject(${sIdx})" style="background:none; border:none; color:#f87171; cursor:pointer; font-size:14px; margin-left:6px;">✕</button>
+      </div>
+    `;
+    header.appendChild(th);
+  });
+
+  body.innerHTML = "";
+  CRITERIA.forEach(crit => {
+    const tr = document.createElement("tr");
+
+    const tdCrit = document.createElement("td");
+    tdCrit.className = "crit-col";
+    tdCrit.innerHTML = `<strong>${crit.label}</strong>`;
+    tr.appendChild(tdCrit);
+
+    const tdOur = document.createElement("td");
+    tdOur.className = "our-cell";
+    tdOur.style.display = proj.showOurCompany ? "" : "none";
+    tdOur.innerHTML = `<div class="editable-cell" contenteditable="true" onblur="updateOurField('${crit.key}', this.innerText)">${escapeHtml(proj.ourStandard[crit.key] || "—")}</div>`;
+    tr.appendChild(tdOur);
+
+    proj.evaluatedList.forEach((sub, sIdx) => {
+      const td = document.createElement("td");
+      if (sub.type === 'internal') td.className = "internal-cell";
+
+      const val = sub[crit.key] || "—";
+      if (crit.key === "score") {
+        const num = parseInt(val) || 0;
+        const color = num >= 8 ? 'score-green' : (num >= 5 ? 'score-yellow' : 'score-red');
+        td.innerHTML = `
+          <span class="score-badge ${color}">${escapeHtml(val)} / 10</span>
+          <div class="editable-cell" style="margin-top:4px;" contenteditable="true" onblur="updateSubCell(${sIdx}, '${crit.key}', this.innerText)">${escapeHtml(val)}</div>
+        `;
+      } else {
+        td.innerHTML = `<div class="editable-cell" contenteditable="true" onblur="updateSubCell(${sIdx}, '${crit.key}', this.innerText)">${escapeHtml(val)}</div>`;
+      }
+      tr.appendChild(td);
+    });
+
+    body.appendChild(tr);
+  });
+}
+
+function updateOurField(key, val) {
+  const proj = getActiveProject();
+  proj.ourStandard[key] = val.trim();
+  persistDatabase();
+}
+
+function updateSubCell(sIdx, key, val) {
+  const proj = getActiveProject();
+  if (proj.evaluatedList[sIdx]) {
+    proj.evaluatedList[sIdx][key] = val.trim();
+    persistDatabase();
+  }
+}
+
+function removeSubject(idx) {
+  if (confirm("Удалить этого участника из матрицы?")) {
+    const proj = getActiveProject();
+    proj.evaluatedList.splice(idx, 1);
+    persistDatabase();
+    updateCompetitorDatalist();
+    renderMatrix();
+    renderProjectsTabs();
+  }
+}
+
+function clearCurrentProjectMatrix() {
+  if (confirm("Очистить всех конкурентов в текущем проекте?")) {
+    const proj = getActiveProject();
+    proj.evaluatedList = [];
+    persistDatabase();
+    updateCompetitorDatalist();
+    renderMatrix();
+    renderProjectsTabs();
+  }
+}
+
+function toggleOurColumn(show) {
+  const proj = getActiveProject();
+  proj.showOurCompany = show;
+  document.getElementById("ourCompanySettingsCard").style.display = show ? "block" : "none";
+  persistDatabase();
+  renderMatrix();
+}
+
+function saveOurStandard() {
+  const proj = getActiveProject();
+  proj.ourStandard.offer = document.getElementById("ourStdOffer").value;
+  proj.ourStandard.price = document.getElementById("ourStdPrice").value;
+  proj.ourStandard.delivery = document.getElementById("ourStdDelivery").value;
+  persistDatabase();
+  renderMatrix();
+  alert("Эталон компании сохранен.");
+}
+
+// --- Переключение видов (Матрица / Стратегический отчет) ---
+function switchRightView(view) {
+  document.getElementById("viewMatrixBtn").classList.toggle("active", view === 'matrix');
+  document.getElementById("viewReportBtn").classList.toggle("active", view === 'report');
+  document.getElementById("matrixViewContainer").style.display = view === 'matrix' ? 'block' : 'none';
+  document.getElementById("reportViewContainer").style.display = view === 'report' ? 'block' : 'none';
+}
+
+// --- Генерация Стратегического Аудита (Senior Marketer) ---
+async function generateStrategicReport() {
+  const proj = getActiveProject();
+  if (!proj.evaluatedList.length) {
+    alert("Сначала добавьте хотя бы одного конкурента в таблицу для анализа.");
+    return;
+  }
+
+  const cfg = getApiConfig();
+  const mode = document.querySelector('input[name="reportMode"]:checked').value;
+  const isWithUs = mode === 'with_us';
+
+  const reportContainer = document.getElementById("strategicReportContent");
+  const btn = document.getElementById("genReportBtn");
+  btn.disabled = true;
+  reportContainer.innerHTML = "⏳ ИИ формирует глубокий стратегический аудит рынка...";
+
+  try {
+    const prompt = `Ты — коммерческий директор и директор по маркетингу с 10-летним стажем.
+Ниша: "${proj.niche}".
+Список исследованных игроков: ${JSON.stringify(proj.evaluatedList, null, 2)}.
+${isWithUs ? `Параметры нашей компании: ${JSON.stringify(proj.ourStandard, null, 2)}` : 'Анализ проводится БЕЗ участия нашей компании (чистый объективный срез рынка).' }
+
+Сформируй комплексный аналитический отчёт для руководства в формате чистого HTML (без markdown-оберток \`\`\`html):
+
+<h3>1. Ценовой ландшафт и скрытая маржинальность</h3>
+- Анализ ценового коридора, минимального порога входа, скрытых платежей, комиссий и структуры наценок.
+
+<h3>2. Скорость воронки и скриптовая зрелость</h3>
+- Оценка speed-to-lead, дисциплины повторных касаний и зрелости отделов продаж конкурентов (кто сливает лиды, кто жестко закрывает).
+
+<h3>3. Ахиллесова пята и системные уязвимости конкурентов</h3>
+- Где игроки рынка массово ошибаются (непрозрачность смет, долгие расчеты, бросание клиентов).
+
+${isWithUs ? `
+<h3>4. Тактические карты контр-игры (Battle Cards против каждого)</h3>
+- Четкие тезисы для наших менеджеров: какими аргументами и УТП бить каждого из исследованных конкурентов в диалоге с клиентом.
+
+<h3>5. Точки роста и отжатие доли рынка</h3>
+- 3 конкретных шага: что внедрить в наш оффер и маркетинг уже завтра, чтобы выигрывать тендеры и забирать клиентов.
+` : `
+<h3>4. Карта позиционирования рынка</h3>
+- Распределение игроков по сегментам (дискаунтеры, премиум, эксперты) и ключевые барьеры входа для клиентов.
+`}
+`;
+
+    const res = await fetch(`${cfg.apiBase}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${cfg.apiKey}`
+      },
+      body: JSON.stringify({
+        model: cfg.model,
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.3
+      })
+    });
+
+    if (!res.ok) throw new Error(`Ошибка: ${res.status}`);
+    const data = await res.json();
+    let htmlContent = data.choices[0].message.content.replace(/```html/g, '').replace(/```/g, '');
+    
+    proj.savedReport = htmlContent;
+    persistDatabase();
+    reportContainer.innerHTML = htmlContent;
+
+  } catch(e) {
+    reportContainer.innerHTML = `<span style="color:#f87171;">Ошибка генерации: ${e.message}</span>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// --- Бэкап и Переносимость (JSON) ---
+function exportDatabaseJSON() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalDatabase, null, 2));
+  const link = document.createElement("a");
+  link.setAttribute("href", dataStr);
+  link.setAttribute("download", `MarketAudit_Backup_${formatDate(new Date())}.json`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function importDatabaseJSON(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.projects && Array.isArray(imported.projects)) {
+        globalDatabase = imported;
+        persistDatabase();
+        renderProjectsTabs();
+        loadCurrentProjectView();
+        alert("База успешно импортирована!");
+      } else {
+        alert("Неверный формат файла бэкапа.");
+      }
+    } catch(err) {
+      alert("Ошибка чтения JSON: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// --- Экспорт в CSV / Excel ---
+function exportToCSV() {
+  const proj = getActiveProject();
+  let csv = "\uFEFF";
+  const headers = ["Критерий"];
+  if (proj.showOurCompany) headers.push("НАША КОМПАНИЯ (Эталон)");
+  proj.evaluatedList.forEach(s => headers.push(`${s.name} (${s.type === 'internal' ? 'Наш' : 'Конкурент'})`));
+
+  csv += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(";") + "\r\n";
+
+  CRITERIA.forEach(crit => {
+    const row = [crit.label];
+    if (proj.showOurCompany) row.push(proj.ourStandard[crit.key] || "");
+    proj.evaluatedList.forEach(s => row.push(s[crit.key] || ""));
+    csv += row.map(cell => `"${String(cell).replace(/"/g, '""').replace(/\n/g, ' ')}"`).join(";") + "\r\n";
+  });
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  downloadFile(blob, `${proj.name}_${formatDate(new Date())}.csv`);
+}
+
+function exportToExcel() {
+  const proj = getActiveProject();
+  let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="utf-8"></head><body><table border="1"><tr><th style="background:#111827;color:#fff;">Критерий</th>`;
+  
+  if (proj.showOurCompany) html += `<th style="background:#065f46;color:#fff;">НАША КОМПАНИЯ (Эталон)</th>`;
+  proj.evaluatedList.forEach(s => {
+    const bg = s.type === 'internal' ? '#4c1d95' : '#1e293b';
+    html += `<th style="background:${bg};color:#fff;">${escapeHtml(s.name)}</th>`;
+  });
+  html += `</tr>`;
+
+  CRITERIA.forEach(crit => {
+    html += `<tr><td><strong>${escapeHtml(crit.label)}</strong></td>`;
+    if (proj.showOurCompany) html += `<td style="background:#f0fdf4;">${escapeHtml(proj.ourStandard[crit.key] || "")}</td>`;
+    proj.evaluatedList.forEach(s => {
+      html += `<td>${escapeHtml(s[crit.key] || "")}</td>`;
+    });
+    html += `</tr>`;
+  });
+
+  html += `</table></body></html>`;
+  const blob = new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8" });
+  downloadFile(blob, `${proj.name}_${formatDate(new Date())}.xls`);
+}
+
+function downloadFile(blob, filename) {
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function formatDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function openSettingsModal() { document.getElementById("settingsModal").style.display = "flex"; }
+function closeSettingsModal() { document.getElementById("settingsModal").style.display = "none"; }
+function saveSettings() {
+  const c = {
+    apiKey: document.getElementById("cfgApiKey").value.trim(),
+    apiBase: document.getElementById("cfgApiBase").value.trim(),
+    model: document.getElementById("cfgModel").value.trim()
+  };
+  localStorage.setItem("speshu_cfg_v6", JSON.stringify(c));
+  closeSettingsModal();
+}
+
+async function testApiConnection() {
+  const cfg = getApiConfig();
+  const resElem = document.getElementById("apiTestResult");
+  resElem.textContent = "Проверка соединения...";
+  resElem.style.color = "#93c5fd";
+
+  try {
+    const res = await fetch(`${cfg.apiBase}/balance`, {
+      headers: { "Authorization": `Bearer ${cfg.apiKey}` }
+    });
+    if (!res.ok) throw new Error(`Статус: ${res.status}`);
+    const data = await res.json();
+    resElem.textContent = `✅ Соединение установлено! Баланс: ${data.amount ?? '0'} ₽`;
+    resElem.style.color = "#34d399";
+  } catch (err) {
+    resElem.textContent = `❌ Ошибка подключения: ${err.message}.`;
+    resElem.style.color = "#f87171";
+  }
+}
+
+initApp();
+</script>
+</body>
+</html>
