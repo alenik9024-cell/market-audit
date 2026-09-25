@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>КонкурентСкан Pro — Маркетинговый бенчмаркинг и аудит продаж</title>
+  <!-- Сжатие данных в URL для мгновенного обмена с коллегами без сервера -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
   <style>
     :root {
       --bg: #090d16;
@@ -21,18 +23,18 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; }
-    .container { max-width: 1680px; margin: 0 auto; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding: 14px; }
+    .container { max-width: 1720px; margin: 0 auto; }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       padding-bottom: 12px;
       border-bottom: 1px solid var(--card-border);
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
     .brand h1 { font-size: 20px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
     .brand p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
@@ -45,7 +47,7 @@
       gap: 6px;
       overflow-x: auto;
       padding-bottom: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .project-tab {
@@ -95,8 +97,8 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: 500px 1fr;
-      gap: 18px;
+      grid-template-columns: 490px 1fr;
+      gap: 16px;
     }
     @media (max-width: 1240px) {
       .main-grid { grid-template-columns: 1fr; }
@@ -133,15 +135,15 @@
       outline: none;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-    textarea { resize: vertical; min-height: 70px; }
+    textarea { resize: vertical; min-height: 65px; }
 
-    /* Переключатель режима: Новый vs Дополнение */
+    /* Панель выбора режима */
     .mode-tabs-container {
-      background: rgba(11, 17, 32, 0.8);
+      background: rgba(11, 17, 32, 0.9);
       border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 8px;
-      margin-bottom: 14px;
+      padding: 10px;
+      margin-bottom: 12px;
     }
     .mode-badge {
       display: inline-block;
@@ -149,12 +151,11 @@
       border-radius: 4px;
       font-size: 11px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .mode-badge-new { background: rgba(16, 185, 129, 0.2); color: #34d399; }
     .mode-badge-edit { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
 
-    /* Переключатель типа объекта */
     .type-switcher { display: flex; gap: 6px; margin-bottom: 10px; }
     .type-btn {
       flex: 1; padding: 6px; background: var(--input-bg); border: 1px solid var(--card-border);
@@ -174,8 +175,8 @@
     th.crit-col { width: 170px; min-width: 170px; background: #0c121e; }
     th.our-col { width: 230px; min-width: 230px; background: #064e3b; color: #a7f3d0; }
     td.our-cell { background: rgba(6, 78, 59, 0.15); }
-    th.comp-col { width: 250px; min-width: 250px; }
-    th.internal-col { width: 250px; min-width: 250px; background: #4c1d95; color: #ddd6fe; }
+    th.comp-col { width: 260px; min-width: 260px; }
+    th.internal-col { width: 260px; min-width: 260px; background: #4c1d95; color: #ddd6fe; }
     td.internal-cell { background: rgba(139, 92, 246, 0.1); }
     
     .editable-cell { outline: none; padding: 3px; border-radius: 4px; white-space: pre-wrap; word-break: break-word; }
@@ -196,26 +197,53 @@
       padding: 8px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;
     }
 
-    .view-switcher { display: flex; gap: 6px; margin-bottom: 12px; }
+    .view-switcher { display: flex; gap: 6px; }
     .view-btn {
       padding: 8px 14px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 6px;
       color: var(--text-muted); cursor: pointer; font-size: 13px; font-weight: 600;
     }
     .view-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
+    /* Стили глубокого отчёта маркетолога */
     .report-card {
-      background: #0b1220; border: 1px solid #1e293b; border-radius: 8px; padding: 18px; margin-top: 10px;
-      line-height: 1.6; font-size: 13px; color: #cbd5e1;
+      background: #080d1a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 22px;
+      margin-top: 12px;
+      line-height: 1.65;
+      font-size: 13px;
+      color: #cbd5e1;
     }
-    .report-card h3 { color: #93c5fd; margin-top: 14px; margin-bottom: 6px; font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px; }
+    .report-card h2 { color: #60a5fa; font-size: 18px; margin-bottom: 12px; border-bottom: 2px solid #1e293b; padding-bottom: 6px; }
+    .report-card h3 { color: #93c5fd; margin-top: 18px; margin-bottom: 8px; font-size: 15px; border-left: 3px solid #3b82f6; padding-left: 8px; }
+    .report-card h4 { color: #fde047; font-size: 13px; margin-top: 12px; margin-bottom: 4px; }
     .report-card ul { margin-left: 20px; margin-bottom: 10px; }
-    .report-card strong { color: #fff; }
+    .report-card li { margin-bottom: 5px; }
+    .report-card strong { color: #fff; font-weight: 600; }
+    .battle-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .battle-card-title { font-weight: 700; color: #f87171; font-size: 13px; margin-bottom: 4px; }
+    .script-quote {
+      background: rgba(15, 23, 42, 0.9);
+      border-left: 3px solid #10b981;
+      padding: 6px 10px;
+      margin-top: 6px;
+      font-style: italic;
+      color: #a7f3d0;
+      border-radius: 0 4px 4px 0;
+    }
 
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000;
     }
-    .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; width: 500px; max-width: 90vw; padding: 22px; }
+    .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; width: 560px; max-width: 90vw; padding: 22px; }
   </style>
 </head>
 <body>
@@ -227,6 +255,8 @@
       <p>Бенчмаркинг офферов, аудит документов/звонков и стратегическая разведка</p>
     </div>
     <div class="header-actions">
+      <!-- ГЛАВНАЯ КНОПКА СОВМЕСТНОГО ДОСТУПА -->
+      <button class="btn btn-purple" onclick="openShareModal()">🔗 Поделиться ссылкой (для коллеги)</button>
       <button class="btn btn-secondary" onclick="exportDatabaseJSON()">📁 Бэкап (JSON)</button>
       <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Загрузить JSON</button>
       <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importDatabaseJSON(this)">
@@ -244,11 +274,11 @@
     <div id="formContainer">
       <div class="card">
         <div class="card-title">
-          <span>📝 Карточка аудита</span>
+          <span>📝 Карточка конкурента / аудита</span>
           <span id="scanStatus" class="status-msg"></span>
         </div>
 
-        <!-- БЛОК ПЕРЕКЛЮЧЕНИЯ: НОВЫЙ ИЛИ ДОПОЛНЕНИЕ СУЩЕСТВУЮЩЕГО -->
+        <!-- Режимы: Новый vs Дозаполнение -->
         <div class="mode-tabs-container">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <div id="currentModeBadge" class="mode-badge mode-badge-new">➕ Создание НОВОГО конкурента</div>
@@ -273,7 +303,7 @@
 
         <div class="form-group">
           <label id="subjectNameLabel">Название конкурента / Ссылка</label>
-          <input type="text" id="targetName" placeholder="например: Конкурент Альфа или chinatoday.ru">
+          <input type="text" id="targetName" placeholder="например: Конкурент Бета или site.ru">
         </div>
 
         <div class="form-row">
@@ -342,13 +372,19 @@
         </div>
 
         <div class="form-group">
-          <label>Текст переписки / заметки по диалогу</label>
-          <textarea id="dialogTranscriptInput" placeholder="Вставьте переписку, детали звонка или комментарии..."></textarea>
+          <label>Текст переписки / детали счёта / заметки</label>
+          <textarea id="dialogTranscriptInput" placeholder="Вставьте переписку, детали звонка, спецификацию или комментарии..."></textarea>
         </div>
 
-        <button type="button" id="submitAuditBtn" class="btn" style="width: 100%; justify-content: center; padding: 11px; font-size: 13px;" onclick="executeIncrementalAnalysis()">
-          🤖 Запустить AI-аудит (Добавить в матрицу)
-        </button>
+        <!-- КНОПКИ ДЕЙСТВИЯ -->
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="submitAuditBtn" class="btn" style="flex: 2; justify-content: center; padding: 11px;" onclick="executeIncrementalAnalysis()">
+            🤖 Запустить AI-анализ и обновить
+          </button>
+          <button type="button" class="btn btn-success" style="flex: 1; justify-content: center; padding: 11px;" onclick="manualSaveSubjectCard()">
+            💾 Сохранить карточку
+          </button>
+        </div>
       </div>
 
       <!-- Эталон Нашей компании -->
@@ -378,9 +414,9 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
           <div class="view-switcher">
             <button class="view-btn active" id="viewMatrixBtn" onclick="switchRightView('matrix')">📊 Сводная матрица</button>
-            <button class="view-btn" id="viewReportBtn" onclick="switchRightView('report')">🧠 Стратегический анализ маркетолога</button>
+            <button class="view-btn" id="viewReportBtn" onclick="switchRightView('report')">🧠 Стратегический аудит маркетолога</button>
           </div>
-          <div style="display: flex; gap: 6px;">
+          <div style="display: flex; gap: 6px; align-items: center;">
             <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer; text-transform: none;">
               <input type="checkbox" id="showOurColToggle" checked onchange="toggleOurColumn(this.checked)"> Колонка «Наша компания»
             </label>
@@ -408,25 +444,53 @@
 
         <!-- Вид 2: Стратегический анализ -->
         <div id="reportViewContainer" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15,23,42,0.8); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); flex-wrap: wrap; gap: 8px;">
             <div>
-              <span style="font-size: 13px; font-weight: 700; color: #93c5fd;">Режим формирования выводов:</span>
-              <div style="display: inline-flex; margin-left: 10px; gap: 6px;">
+              <span style="font-size: 13px; font-weight: 700; color: #93c5fd;">Режим анализа:</span>
+              <div style="display: inline-flex; margin-left: 10px; gap: 8px;">
                 <label style="font-size: 12px; cursor: pointer; text-transform: none;">
                   <input type="radio" name="reportMode" value="with_us" checked> В сравнении с Нашей компанией
                 </label>
-                <label style="font-size: 12px; cursor: pointer; text-transform: none; margin-left: 10px;">
+                <label style="font-size: 12px; cursor: pointer; text-transform: none; margin-left: 6px;">
                   <input type="radio" name="reportMode" value="pure_market"> Чистый срез рынка (без нас)
                 </label>
               </div>
             </div>
-            <button class="btn btn-purple btn-xs" id="genReportBtn" onclick="generateStrategicReport()">⚡ Сформировать аудит</button>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-purple" id="genReportBtn" onclick="generateStrategicReport()">⚡ Сформировать глубокий аудит</button>
+              <button class="btn btn-success" onclick="saveCurrentReportText()">💾 Зафиксировать расчет</button>
+              <button class="btn btn-secondary" onclick="printReport()">🖨️ Печать / PDF</button>
+            </div>
           </div>
 
           <div id="strategicReportContent" class="report-card">
-            Нажмите кнопку «Сформировать аудит», чтобы запустить комплексный маркетинговый анализ на основе накопленных данных по конкурентам.
+            Нажмите кнопку «Сформировать глубокий аудит», чтобы запустить профессиональный коммерческий разбор конкурентов.
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно Поделиться ссылкой с коллегой -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal">
+    <h3 style="margin-bottom: 10px; color: #93c5fd;">🔗 Совместный доступ для коллег</h3>
+    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+      Вся текущая база (проекты, добавленные конкуренты, файлы, переписки и расчеты) зашифрована прямо в эту ссылку. 
+      Отправьте её коллеге — он откроет её на своём компьютере, увидит все данные и сможет продолжить заполнение!
+    </p>
+
+    <div class="form-group">
+      <label>Персональная ссылка с вашими данными:</label>
+      <textarea id="shareUrlTextarea" style="min-height: 100px; font-size: 11px; font-family: monospace; color: #a7f3d0;" readonly></textarea>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+      <span id="copyLinkStatus" style="font-size: 12px; color: #34d399; font-weight: bold; display: none;">Скопировано в буфер!</span>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-secondary" onclick="closeShareModal()">Закрыть</button>
+        <button class="btn btn-success" onclick="copyShareUrl()">📋 Скопировать ссылку</button>
       </div>
     </div>
   </div>
@@ -489,7 +553,7 @@ let globalDatabase = {
     {
       id: "proj_1",
       name: "Основной анализ",
-      niche: "Услуги и B2B",
+      niche: "Логистика и ВЭД Китай / Услуги B2B",
       showOurCompany: true,
       ourStandard: {
         speed: "До 5 минут (WhatsApp / Звонок)",
@@ -513,19 +577,40 @@ let globalDatabase = {
 
 let currentSubjectType = "comp";
 let activePickedFile = null;
-let currentEditingSubjectId = null; // null = создание нового
+let currentEditingSubjectId = null;
 
 function getActiveProject() {
   return globalDatabase.projects.find(p => p.id === globalDatabase.activeProjectId) || globalDatabase.projects[0];
 }
 
 function initApp() {
-  const savedDb = localStorage.getItem("speshu_master_db_v7");
+  // 1. Проверяем наличие входящей ссылки с данными от коллеги
+  if (window.location.hash.startsWith('#data=')) {
+    try {
+      const compressed = window.location.hash.slice(6);
+      const decompressed = LZString.decompressFromEncodedURIComponent(compressed);
+      if (decompressed) {
+        const imported = JSON.parse(decompressed);
+        if (imported.projects) {
+          globalDatabase = imported;
+          persistDatabase();
+          // Очищаем хэш в строке браузера, чтобы не перегружать URL
+          history.replaceState(null, null, window.location.pathname);
+          alert("🎉 Данные успешно загружены из ссылки коллеги! Все конкуренты и расчеты обновлены.");
+        }
+      }
+    } catch(e) {
+      console.error("Ошибка парсинга ссылки", e);
+    }
+  }
+
+  // 2. Читаем локальную память браузера
+  const savedDb = localStorage.getItem("speshu_master_db_v8");
   if (savedDb) {
     try { globalDatabase = JSON.parse(savedDb); } catch(e){}
   }
 
-  const savedCfg = localStorage.getItem("speshu_cfg_v7");
+  const savedCfg = localStorage.getItem("speshu_cfg_v8");
   if (savedCfg) {
     try {
       const c = JSON.parse(savedCfg);
@@ -541,7 +626,7 @@ function initApp() {
 }
 
 function persistDatabase() {
-  localStorage.setItem("speshu_master_db_v7", JSON.stringify(globalDatabase));
+  localStorage.setItem("speshu_master_db_v8", JSON.stringify(globalDatabase));
 }
 
 function getApiConfig() {
@@ -550,6 +635,30 @@ function getApiConfig() {
     apiBase: document.getElementById("cfgApiBase").value.trim().replace(/\/+$/, ""),
     model: document.getElementById("cfgModel").value.trim() || "google/gemini-3.1-flash-lite"
   };
+}
+
+// --- Управление совместным доступом по ссылке ---
+function openShareModal() {
+  persistDatabase();
+  const jsonStr = JSON.stringify(globalDatabase);
+  const compressed = LZString.compressToEncodedURIComponent(jsonStr);
+  const shareUrl = window.location.origin + window.location.pathname + '#data=' + compressed;
+  
+  document.getElementById("shareUrlTextarea").value = shareUrl;
+  document.getElementById("copyLinkStatus").style.display = "none";
+  document.getElementById("shareModal").style.display = "flex";
+}
+
+function closeShareModal() {
+  document.getElementById("shareModal").style.display = "none";
+}
+
+function copyShareUrl() {
+  const textarea = document.getElementById("shareUrlTextarea");
+  textarea.select();
+  navigator.clipboard.writeText(textarea.value).then(() => {
+    document.getElementById("copyLinkStatus").style.display = "inline-block";
+  });
 }
 
 // --- Управление вкладками проектов ---
@@ -582,13 +691,13 @@ function switchProject(pId) {
 }
 
 function createNewProject() {
-  const name = prompt("Введите название нового анализа (например: Оборудование 2026):");
+  const name = prompt("Введите название нового анализа (например: Логистика Китай 2026):");
   if (!name || !name.trim()) return;
 
   const newProj = {
     id: "proj_" + Date.now(),
     name: name.trim(),
-    niche: "Услуги и B2B",
+    niche: "Логистика и ВЭД Китай / Услуги B2B",
     showOurCompany: true,
     ourStandard: { ...globalDatabase.projects[0].ourStandard },
     pendingLeads: [],
@@ -627,7 +736,7 @@ function loadCurrentProjectView() {
   if (proj.savedReport) {
     document.getElementById("strategicReportContent").innerHTML = proj.savedReport;
   } else {
-    document.getElementById("strategicReportContent").innerHTML = "Нажмите кнопку «Сформировать аудит», чтобы запустить комплексный маркетинговый анализ на основе накопленных данных по конкурентам.";
+    document.getElementById("strategicReportContent").innerHTML = "Нажмите кнопку «Сформировать глубокий аудит», чтобы запустить профессиональный коммерческий разбор конкурентов.";
   }
 
   resetFormToNew();
@@ -636,7 +745,7 @@ function loadCurrentProjectView() {
   renderMatrix();
 }
 
-// --- Управление режимом Дополнения / Создания нового ---
+// --- Управление режимом карточки (Новый vs Дополнение) ---
 function updateExistingSubjectsDropdown() {
   const proj = getActiveProject();
   const select = document.getElementById("existingSubjectSelect");
@@ -671,7 +780,7 @@ function resetFormToNew() {
   document.getElementById("materialFileInfo").textContent = "";
   activePickedFile = null;
 
-  document.getElementById("submitAuditBtn").textContent = "🤖 Запустить AI-аудит (Добавить в матрицу)";
+  document.getElementById("submitAuditBtn").textContent = "🤖 Запустить AI-анализ и обновить";
 }
 
 function onSelectExistingSubject(val) {
@@ -696,16 +805,14 @@ function loadSubjectForUpdating(subjectId) {
 
   switchSubjectType(sub.type);
   document.getElementById("targetName").value = sub.name;
-  document.getElementById("targetName").disabled = true; // имя зафиксировано
+  document.getElementById("targetName").disabled = true;
   
   document.getElementById("dialogTranscriptInput").value = "";
   document.getElementById("materialFileInput").value = "";
   document.getElementById("materialFileInfo").textContent = "";
   activePickedFile = null;
 
-  document.getElementById("submitAuditBtn").textContent = `🔄 Обновить досье «${sub.name}» новыми данными`;
-
-  // Плавный скролл к форме
+  document.getElementById("submitAuditBtn").textContent = `🔄 Обновить досье «${sub.name}»`;
   document.getElementById("formContainer").scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -860,7 +967,55 @@ function fileToBase64Data(file) {
   });
 }
 
-// --- Выполнение анализа (Создание или Обновление) ---
+// Ручное сохранение карточки (без ИИ)
+function manualSaveSubjectCard() {
+  const name = document.getElementById("targetName").value.trim();
+  const channel = document.getElementById("targetChannel").value;
+  const speed = document.getElementById("deltaManualInput").value.trim();
+  const closing = document.getElementById("closingSelect").value;
+  const notes = document.getElementById("dialogTranscriptInput").value.trim();
+
+  if (!name) {
+    alert("Укажите имя конкурента!");
+    return;
+  }
+
+  const proj = getActiveProject();
+  const existingSub = currentEditingSubjectId ? proj.evaluatedList.find(s => s.id === currentEditingSubjectId) : null;
+
+  if (existingSub) {
+    if (speed) existingSub.speed = `${speed} (${channel})`;
+    existingSub.recalled = closing;
+    if (notes) existingSub.offer = (existingSub.offer + " | " + notes).replace(/^— \| /, '');
+    alert("Карточка обновлена!");
+  } else {
+    proj.evaluatedList.push({
+      id: "eval_" + Date.now(),
+      type: currentSubjectType,
+      name: name,
+      speed: speed ? `${speed} (${channel})` : channel,
+      offer: notes || "—",
+      price: "—",
+      delivery: "—",
+      recalled: closing,
+      qualification: "—",
+      objections: "—",
+      closing: "—",
+      score: "7",
+      pros: "—",
+      cons: "—"
+    });
+    alert("Конкурент сохранен в матрицу!");
+  }
+
+  persistDatabase();
+  updateExistingSubjectsDropdown();
+  renderMatrix();
+  renderProjectsTabs();
+  resetFormToNew();
+}
+
+// --- Выполнение AI-анализа (Создание или Обновление) ---
 async function executeIncrementalAnalysis() {
   const cfg = getApiConfig();
   if (!cfg.apiKey) {
@@ -1009,7 +1164,6 @@ async function executeIncrementalAnalysis() {
 
     setStatus("Успешно сохранено!", "success");
     setTimeout(() => setStatus(null), 3000);
-
     resetFormToNew();
 
   } catch (err) {
@@ -1153,7 +1307,7 @@ function switchRightView(view) {
   document.getElementById("reportViewContainer").style.display = view === 'report' ? 'block' : 'none';
 }
 
-// --- Стратегический анализ ---
+// --- ПРОФЕССИОНАЛЬНЫЙ СТРАТЕГИЧЕСКИЙ АУДИТ (SENIOR CMO) ---
 async function generateStrategicReport() {
   const proj = getActiveProject();
   if (!proj.evaluatedList.length) {
@@ -1168,34 +1322,51 @@ async function generateStrategicReport() {
   const reportContainer = document.getElementById("strategicReportContent");
   const btn = document.getElementById("genReportBtn");
   btn.disabled = true;
-  reportContainer.innerHTML = "⏳ ИИ формирует глубокий стратегический аудит рынка...";
+  reportContainer.innerHTML = "⏳ ИИ формирует глубокий стратегический аудит рынка (анализирует ценообразование, скрипты, договоры и риски)...";
 
   try {
-    const prompt = `Ты — коммерческий директор и директор по маркетингу с 10-летним стажем.
-Ниша: "${proj.niche}".
-Список исследованных игроков: ${JSON.stringify(proj.evaluatedList, null, 2)}.
-${isWithUs ? `Параметры нашей компании: ${JSON.stringify(proj.ourStandard, null, 2)}` : 'Анализ проводится БЕЗ участия нашей компании (чистый объективный срез рынка).' }
+    const prompt = `Ты — коммерческий директор и директор по маркетингу с 10-летним стажем в B2B и логистике.
+Проанализируй реальные собранные данные по конкурентам:
+НИША: "${proj.niche}"
+СПИСОК ИГРОКОВ И ИХ ДАННЫЕ:
+${JSON.stringify(proj.evaluatedList, null, 2)}
+${isWithUs ? `ЭТАЛОН НАШЕЙ КОМПАНИИ:\n${JSON.stringify(proj.ourStandard, null, 2)}` : 'Анализ проводится БЕЗ участия нашей компании (чистый объективный срез рынка).' }
 
-Сформируй комплексный аналитический отчёт для руководства в формате чистого HTML (без markdown-оберток \`\`\`html):
+Сформируй глубокий, подробный, экспертный стратегический отчёт без воды, с конкретными цифрами, тактиками и формулировками в формате ЧИСТОГО HTML (без оберток \`\`\`html):
 
-<h3>1. Ценовой ландшафт и скрытая маржинальность</h3>
-- Анализ ценового коридора, минимального порога входа, скрытых платежей, комиссий и структуры наценок.
+<h2>СТРАТЕГИЧЕСКИЙ АУДИТ И РАЗВЕДКА КОНКУРЕНТНОЙ СРЕДЫ</h2>
 
-<h3>2. Скорость воронки и скриптовая зрелость</h3>
-- Оценка speed-to-lead, дисциплины повторных касаний и зрелости отделов продаж конкурентов (кто сливает лиды, кто жестко закрывает).
+<h3>1. Анатомия ценообразования и скрытая маржинальность</h3>
+- Разбери реальную структуру цен каждого конкурента: где у них порог входа, где зашит заработок (в стоимости услуг, завышенном курсе юаня/доллара, агентском проценте, скрытых платежах за перегруз/страховку).
+- Сравни их модели: у кого платный подбор/расчет (барьер для нецелевых), у кого «бесплатный расчет» (с зашитой маржой).
 
-<h3>3. Ахиллесова пята и системные уязвимости конкурентов</h3>
-- Где игроки рынка массово ошибаются (непрозрачность смет, долгие расчеты, бросание клиентов).
+<h3>2. Аудит договоров, КП и правовых рисков для клиента</h3>
+- Детальный разбор условий: кто берет на себя риски задержки, простоев на границе, конфискации или боя груза, а кто перекладывает это на клиента.
+- Насколько прозрачны присылаемые ими сметы/счета.
+
+<h3>3. Зрелость и ошибки отделов продаж</h3>
+- Оценка скорости (Speed-to-Lead): кто перезванивает за 5 минут, а кто сливает лиды часами.
+- Оценка квалификации: выявляют ли реальную задачу клиента или просто выкатывают сухой расчет.
+- Оценка дожима: какие триггеры используют (скидка, дедлайн, бронирование места) или бросают клиента после отправки КП.
 
 ${isWithUs ? `
-<h3>4. Тактические карты контр-игры (Battle Cards против каждого)</h3>
-- Четкие тезисы для наших менеджеров: какими аргументами и УТП бить каждого из исследованных конкурентов в диалоге с клиентом.
+<h3>4. Тактические карты контр-игры (Battle Cards против каждого конкурента)</h3>
+Создай для каждого исследованного конкурента отдельный блок:
+<div class="battle-card">
+  <div class="battle-card-title">Против конкурента: [Название]</div>
+  <p><strong>Их ключевой крючок:</strong> [чем они заманивают клиента]</p>
+  <p><strong>Их уязвимость / скрытый подвох:</strong> [в чем реальный минус их схемы: переплата, сроки, риск]</p>
+  <div class="script-quote"><strong>Убийственный вопрос нашего менеджера клиенту:</strong> «[Точная фраза, которую менеджер говорит клиенту, чтобы дискредитировать предложение этого конкурента без прямого оскорбления]»</div>
+</div>
 
-<h3>5. Точки роста и отжатие доли рынка</h3>
-- 3 конкретных шага: что внедрить в наш оффер и маркетинг уже завтра, чтобы выигрывать тендеры и забирать клиентов.
+<h3>5. План победы: 3 конкретных шага по отжатию доли рынка</h3>
+1. <strong>Коррекция оффера:</strong> что изменить в нашем позиционировании и первом сообщении клиенту уже завтра.
+2. <strong>Убийственное коммерческое предложение:</strong> какую деталь/гарантию добавить в наше КП, которой нет ни у кого из них.
+3. <strong>Регламент дожима:</strong> как выстроить касания, чтобы забирать клиентов, которых бросили конкуренты.
 ` : `
-<h3>4. Карта позиционирования рынка</h3>
-- Распределение игроков по сегментам (дискаунтеры, премиум, эксперты) и ключевые барьеры входа для клиентов.
+<h3>4. Карта сегментации рынка и свободные ниши</h3>
+- Распределение игроков: Лоукостеры / Эксперты / Премиум.
+- В чем главная незакрытая боль клиентов в этой нише, которую не решает ни один из проверенных игроков.
 `}
 `;
 
@@ -1225,6 +1396,23 @@ ${isWithUs ? `
   } finally {
     btn.disabled = false;
   }
+}
+
+// Фиксация отчета в проект
+function saveCurrentReportText() {
+  const proj = getActiveProject();
+  const html = document.getElementById("strategicReportContent").innerHTML;
+  proj.savedReport = html;
+  persistDatabase();
+  alert("Расчет и стратегический аудит успешно зафиксированы в проекте!");
+}
+
+function printReport() {
+  const content = document.getElementById("strategicReportContent").innerHTML;
+  const win = window.open('', '_blank');
+  win.document.write(`<html><head><title>Стратегический аудит рынка</title><style>body{font-family:sans-serif;padding:30px;line-height:1.6;color:#111;} h2{color:#1e3a8a;} h3{color:#1d4ed8;margin-top:20px;} .battle-card{border:1px solid #ccc;padding:12px;margin-bottom:12px;border-radius:6px;} .script-quote{background:#f3f4f6;padding:8px;border-left:3px solid #10b981;font-style:italic;}</style></head><body>${content}</body></html>`);
+  win.document.close();
+  win.print();
 }
 
 // --- Бэкап и Экспорт ---
@@ -1333,7 +1521,7 @@ function saveSettings() {
     apiBase: document.getElementById("cfgApiBase").value.trim(),
     model: document.getElementById("cfgModel").value.trim()
   };
-  localStorage.setItem("speshu_cfg_v7", JSON.stringify(c));
+  localStorage.setItem("speshu_cfg_v8", JSON.stringify(c));
   closeSettingsModal();
 }
 
