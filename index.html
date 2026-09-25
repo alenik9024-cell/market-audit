@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>КонкурентСкан Pro — Маркетинговый бенчмаркинг и аудит продаж</title>
+  <title>КонкурентСкан Pro — Корпоративный маркетинговый бенчмаркинг</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
   <style>
     :root {
@@ -38,6 +38,26 @@
     .brand h1 { font-size: 20px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
     .brand p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+    /* Облачный индикатор */
+    .cloud-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.15);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      cursor: pointer;
+    }
+    .cloud-badge.offline {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fde047;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
 
     .projects-bar {
       display: flex;
@@ -246,14 +266,16 @@
   <header>
     <div class="brand">
       <h1>⚡ КонкурентСкан Pro</h1>
-      <p>Бенчмаркинг офферов, аудит документов/звонков и стратегическая разведка</p>
+      <p>Корпоративный бенчмаркинг, аудит расчетов/звонков и разведка рынка</p>
     </div>
     <div class="header-actions">
-      <button class="btn btn-purple" onclick="openShareModal()">🔗 Поделиться ссылкой (для коллеги)</button>
-      <button class="btn btn-secondary" onclick="exportDatabaseJSON()">📁 Бэкап (JSON)</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Загрузить JSON</button>
-      <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importDatabaseJSON(this)">
-      <button class="btn btn-secondary" onclick="openSettingsModal()">⚙️ Настройки API</button>
+      <!-- Облачный индикатор синхронизации -->
+      <div id="cloudSyncStatus" class="cloud-badge" onclick="openSettingsModal()" title="Google Apps Script подключен">
+        ☁️ Облако: подключено
+      </div>
+      <button class="btn btn-secondary" onclick="syncWithCloud()">🔄 Обновить из облака</button>
+      <button class="btn btn-secondary" onclick="exportDatabaseJSON()">📁 Бэкап</button>
+      <button class="btn btn-secondary" onclick="openSettingsModal()">⚙️ Настройки</button>
       <button class="btn btn-secondary" onclick="exportToCSV()">📄 CSV</button>
       <button class="btn btn-success" onclick="exportToExcel()">📊 Excel</button>
     </div>
@@ -262,11 +284,11 @@
   <div class="projects-bar" id="projectsBar"></div>
 
   <div class="main-grid">
-    <!-- Левая колонка: форма ввода -->
+    <!-- Левая колонка -->
     <div id="formContainer">
       <div class="card">
         <div class="card-title">
-          <span>📝 Карточка конкурента / аудита</span>
+          <span>📝 Карточка конкурента</span>
           <span id="scanStatus" class="status-msg"></span>
         </div>
 
@@ -276,7 +298,7 @@
             <button type="button" class="btn btn-secondary btn-xs" onclick="resetFormToNew()">🧹 Очистить под нового</button>
           </div>
 
-          <label>Выбрать из сохраненных (для дозаполнения):</label>
+          <label>Выбрать сохраненного (для дозаполнения):</label>
           <select id="existingSubjectSelect" onchange="onSelectExistingSubject(this.value)">
             <option value="__NEW__">-- ➕ Нажмите сюда для создания НОВОГО конкурента --</option>
           </select>
@@ -366,7 +388,7 @@
 
         <div style="display: flex; gap: 8px;">
           <button type="button" id="submitAuditBtn" class="btn" style="flex: 2; justify-content: center; padding: 11px; font-size: 13px;" onclick="executeIncrementalAnalysis()">
-            🤖 Запустить AI-анализ и обновить
+            🤖 Запустить AI-анализ
           </button>
           <button type="button" class="btn btn-success" style="flex: 1; justify-content: center; padding: 11px;" onclick="manualSaveSubjectCard()">
             💾 Сохранить
@@ -394,7 +416,7 @@
       </div>
     </div>
 
-    <!-- Правая колонка: Матрица и Стратегический отчет -->
+    <!-- Правая колонка -->
     <div>
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
@@ -412,7 +434,7 @@
 
         <div id="matrixViewContainer">
           <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
-            💡 Кликните по любой ячейке таблицы, чтобы отредактировать. Изменения сохраняются автоматически.
+            💡 Кликните по любой ячейке таблицы, чтобы отредактировать. Изменения автоматически синхронизируются в облаке.
           </p>
           <div class="table-container">
             <table id="matrixTable">
@@ -456,37 +478,21 @@
   </div>
 </div>
 
-<!-- Модальное окно Поделиться ссылкой с коллегой -->
-<div class="modal-overlay" id="shareModal">
-  <div class="modal">
-    <h3 style="margin-bottom: 10px; color: #93c5fd;">🔗 Совместный доступ для коллег</h3>
-    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
-      Вся текущая база (проекты, добавленные конкуренты, файлы, переписки и расчеты) зашифрована прямо в эту ссылку. 
-      Отправьте её коллеге — он откроет её на своём компьютере, увидит все данные и сможет продолжить заполнение!
-    </p>
-
-    <div class="form-group">
-      <label>Персональная ссылка с вашими данными:</label>
-      <textarea id="shareUrlTextarea" style="min-height: 100px; font-size: 11px; font-family: monospace; color: #a7f3d0;" readonly></textarea>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-      <span id="copyLinkStatus" style="font-size: 12px; color: #34d399; font-weight: bold; display: none;">Скопировано в буфер!</span>
-      <div style="display: flex; gap: 8px;">
-        <button class="btn btn-secondary" onclick="closeShareModal()">Закрыть</button>
-        <button class="btn btn-success" onclick="copyShareUrl()">📋 Скопировать ссылку</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Модальное окно настроек API -->
+<!-- Модальное окно настроек API и Облака -->
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
-    <h3 style="margin-bottom: 12px;">⚙️ Настройки API SpeShu</h3>
+    <h3 style="margin-bottom: 12px;">⚙️ Настройки API и Общей облачной базы</h3>
     
+    <div class="form-group" style="background: rgba(37,99,235,0.08); border: 1px solid #3b82f6; border-radius: 8px; padding: 10px;">
+      <label style="color: #93c5fd;">☁️ Ссылка на Google Apps Script (Общая база для коллег)</label>
+      <input type="text" id="cfgCloudUrl" placeholder="https://script.google.com/macros/s/.../exec">
+      <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+        Ваш Google Apps Script подключен. Все данные сохраняются на вашем Google Диске.
+      </p>
+    </div>
+
     <div class="form-group">
-      <label>API Key</label>
+      <label>API Key SpeShu</label>
       <input type="password" id="cfgApiKey" value="sk-b32521d6-386e-4933-95e4-9104858f6bde">
     </div>
 
@@ -506,7 +512,7 @@
     </div>
 
     <div style="display: flex; gap: 8px; margin-top: 14px; align-items: center; justify-content: space-between;">
-      <button class="btn btn-secondary btn-xs" onclick="testApiConnection()">🔍 Проверить связь и баланс</button>
+      <button class="btn btn-secondary btn-xs" onclick="testApiConnection()">🔍 Проверить баланс</button>
       <div style="display: flex; gap: 6px;">
         <button class="btn btn-secondary" onclick="closeSettingsModal()">Отмена</button>
         <button class="btn btn-success" onclick="saveSettings()">Сохранить</button>
@@ -517,6 +523,9 @@
 </div>
 
 <script>
+// ВСТРОЕННАЯ ССЫЛКА НА ВАШ GOOGLE APPS SCRIPT:
+const DEFAULT_CLOUD_URL = "https://script.google.com/macros/s/AKfycbxlCR7VwX1a8JkqmI9Jq5xvo_IDwSfpahx6rvr1vhth6zRd-BvA6gUaSuLunL45yXqpRQ/exec";
+
 const CRITERIA = [
   { key: "speed", label: "Скорость и канал первого ответа" },
   { key: "offer", label: "Что предлагают (продукт, комплектация)" },
@@ -567,31 +576,8 @@ function getActiveProject() {
   return globalDatabase.projects.find(p => p.id === globalDatabase.activeProjectId) || globalDatabase.projects[0];
 }
 
-function initApp() {
-  if (window.location.hash.startsWith('#data=')) {
-    try {
-      const compressed = window.location.hash.slice(6);
-      const decompressed = LZString.decompressFromEncodedURIComponent(compressed);
-      if (decompressed) {
-        const imported = JSON.parse(decompressed);
-        if (imported.projects) {
-          globalDatabase = imported;
-          persistDatabase();
-          history.replaceState(null, null, window.location.pathname);
-          alert("🎉 Данные успешно загружены из ссылки коллеги! Все конкуренты и расчеты обновлены.");
-        }
-      }
-    } catch(e) {
-      console.error("Ошибка парсинга ссылки", e);
-    }
-  }
-
-  const savedDb = localStorage.getItem("speshu_master_db_v9");
-  if (savedDb) {
-    try { globalDatabase = JSON.parse(savedDb); } catch(e){}
-  }
-
-  const savedCfg = localStorage.getItem("speshu_cfg_v9");
+async function initApp() {
+  const savedCfg = localStorage.getItem("speshu_cfg_v11");
   if (savedCfg) {
     try {
       const c = JSON.parse(savedCfg);
@@ -599,15 +585,92 @@ function initApp() {
       document.getElementById("cfgApiBase").value = c.apiBase || "https://speshu.ai/api/v1";
       document.getElementById("cfgModel").value = c.model || "google/gemini-3.1-flash-lite";
       document.getElementById("cfgModelSelect").value = c.model || "google/gemini-3.1-flash-lite";
+      document.getElementById("cfgCloudUrl").value = c.cloudUrl || DEFAULT_CLOUD_URL;
     } catch(e){}
+  } else {
+    document.getElementById("cfgCloudUrl").value = DEFAULT_CLOUD_URL;
+  }
+
+  // Читаем локальную память для мгновенного отображения
+  const savedDb = localStorage.getItem("speshu_master_db_v11");
+  if (savedDb) {
+    try { globalDatabase = JSON.parse(savedDb); } catch(e){}
   }
 
   renderProjectsTabs();
   loadCurrentProjectView();
+
+  // Фоном подтягиваем актуальную базу из Google Облака
+  await syncWithCloud(true);
 }
 
+function getCloudUrl() {
+  return document.getElementById("cfgCloudUrl").value.trim() || DEFAULT_CLOUD_URL;
+}
+
+// Синхронизация с Google Apps Script
+async function syncWithCloud(silent = false) {
+  const cloudUrl = getCloudUrl();
+  const badge = document.getElementById("cloudSyncStatus");
+
+  if (!cloudUrl) {
+    badge.className = "cloud-badge offline";
+    badge.textContent = "☁️ Облако: не подключено";
+    return;
+  }
+
+  badge.className = "cloud-badge";
+  badge.textContent = "☁️ Синхронизация...";
+
+  try {
+    const res = await fetch(cloudUrl);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+
+    if (data && data.projects && Array.isArray(data.projects)) {
+      globalDatabase = data;
+      localStorage.setItem("speshu_master_db_v11", JSON.stringify(globalDatabase));
+      renderProjectsTabs();
+      loadCurrentProjectView();
+      badge.className = "cloud-badge";
+      badge.textContent = "☁️ Облако: онлайн (обновлено)";
+      if (!silent) alert("База успешно обновлена из Google Облака!");
+    } else {
+      badge.className = "cloud-badge";
+      badge.textContent = "☁️ Облако: подключено";
+      // Если файл на Диске ещё пустой — сохраняем туда первоначальную базу
+      persistDatabase();
+    }
+  } catch(e) {
+    console.warn("Сбой связи с облаком:", e);
+    badge.className = "cloud-badge offline";
+    badge.textContent = "☁️ Ошибка связи с облаком";
+    if (!silent) alert("Не удалось связаться с Google Скриптом. Проверьте ссылку и права доступа.");
+  }
+}
+
+// Сохранение локально и в Облако Google
 function persistDatabase() {
-  localStorage.setItem("speshu_master_db_v9", JSON.stringify(globalDatabase));
+  localStorage.setItem("speshu_master_db_v11", JSON.stringify(globalDatabase));
+  
+  const cloudUrl = getCloudUrl();
+  if (cloudUrl) {
+    const badge = document.getElementById("cloudSyncStatus");
+    badge.textContent = "☁️ Сохранение в облако...";
+    
+    fetch(cloudUrl, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(globalDatabase)
+    }).then(() => {
+      badge.className = "cloud-badge";
+      badge.textContent = "☁️ Облако: сохранено";
+    }).catch(e => {
+      console.warn("Ошибка сохранения в облако:", e);
+      badge.className = "cloud-badge offline";
+      badge.textContent = "☁️ Облако: сохранено локально";
+    });
+  }
 }
 
 function getApiConfig() {
@@ -618,31 +681,7 @@ function getApiConfig() {
   };
 }
 
-// --- Управление совместным доступом по ссылке ---
-function openShareModal() {
-  persistDatabase();
-  const jsonStr = JSON.stringify(globalDatabase);
-  const compressed = LZString.compressToEncodedURIComponent(jsonStr);
-  const shareUrl = window.location.origin + window.location.pathname + '#data=' + compressed;
-  
-  document.getElementById("shareUrlTextarea").value = shareUrl;
-  document.getElementById("copyLinkStatus").style.display = "none";
-  document.getElementById("shareModal").style.display = "flex";
-}
-
-function closeShareModal() {
-  document.getElementById("shareModal").style.display = "none";
-}
-
-function copyShareUrl() {
-  const textarea = document.getElementById("shareUrlTextarea");
-  textarea.select();
-  navigator.clipboard.writeText(textarea.value).then(() => {
-    document.getElementById("copyLinkStatus").style.display = "inline-block";
-  });
-}
-
-// --- Управление вкладками проектов ---
+// --- Управление проектами ---
 function renderProjectsTabs() {
   const bar = document.getElementById("projectsBar");
   bar.innerHTML = "";
@@ -672,7 +711,7 @@ function switchProject(pId) {
 }
 
 function createNewProject() {
-  const name = prompt("Введите название нового анализа (например: Логистика Китай 2026):");
+  const name = prompt("Введите название нового анализа (например: Оборудование 2026):");
   if (!name || !name.trim()) return;
 
   const newProj = {
@@ -760,7 +799,7 @@ function resetFormToNew() {
   document.getElementById("materialFileInfo").textContent = "";
   activePickedFile = null;
 
-  document.getElementById("submitAuditBtn").textContent = "🤖 Запустить AI-анализ и обновить";
+  document.getElementById("submitAuditBtn").textContent = "🤖 Запустить AI-анализ";
 }
 
 function onSelectExistingSubject(val) {
@@ -802,7 +841,6 @@ function switchSubjectType(type) {
   document.getElementById("typeInternalBtn").className = `type-btn ${type === 'internal' ? 'active internal' : ''}`;
 }
 
-// Фиксация времени
 function setNowTime(targetInputId) {
   const d = new Date();
   const timeStr = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
@@ -835,7 +873,6 @@ function autoCalculateDelta() {
   }
 }
 
-// Очередь заявок
 function parkLeadToWaiting() {
   const name = document.getElementById("targetName").value.trim();
   const channel = document.getElementById("targetChannel").value;
@@ -947,7 +984,6 @@ function fileToBase64Data(file) {
   });
 }
 
-// Ручное сохранение карточки (без ИИ)
 function manualSaveSubjectCard() {
   const name = document.getElementById("targetName").value.trim();
   const channel = document.getElementById("targetChannel").value;
@@ -967,7 +1003,7 @@ function manualSaveSubjectCard() {
     if (speed) existingSub.speed = `${speed} (${channel})`;
     existingSub.recalled = closing;
     if (notes) existingSub.offer = (existingSub.offer + " | " + notes).replace(/^— \| /, '');
-    alert("Карточка обновлена!");
+    alert("Карточка сохранена в Google Облако!");
   } else {
     proj.evaluatedList.push({
       id: "eval_" + Date.now(),
@@ -985,7 +1021,7 @@ function manualSaveSubjectCard() {
       pros: "—",
       cons: "—"
     });
-    alert("Конкурент сохранен в матрицу!");
+    alert("Конкурент добавлен и синхронизирован в Google Облаке!");
   }
 
   persistDatabase();
@@ -995,42 +1031,25 @@ function manualSaveSubjectCard() {
   resetFormToNew();
 }
 
-// =========================================================================
-// НЕУБИВАЕМЫЙ ПАРСЕР JSON И СТРУКТУРИРОВАННОГО ОТВЕТА МОДЕЛИ
-// =========================================================================
+// 5-уровневый парсер JSON
 function cleanAndParseJSON(raw) {
-  if (!raw || typeof raw !== 'string') {
-    throw new Error("Пустой ответ от сервера модели.");
-  }
-  
+  if (!raw || typeof raw !== 'string') throw new Error("Пустой ответ от сервера.");
   let str = raw.trim();
-  // Убираем markdown обертки ```json ... ```
   if (str.includes('```')) {
     str = str.replace(/^```[a-z]*\s*/i, '').replace(/\s*```$/i, '').trim();
   }
 
-  // Попытка 1: Прямой парсинг
-  try {
-    return JSON.parse(str);
-  } catch (e) {}
+  try { return JSON.parse(str); } catch (e) {}
 
-  // Попытка 2: Вырезаем только блок от первого { до последнего }
   const firstBrace = str.indexOf('{');
   const lastBrace = str.lastIndexOf('}');
   if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
     const jsonBlock = str.substring(firstBrace, lastBrace + 1);
-    try {
-      return JSON.parse(jsonBlock);
-    } catch (e) {}
-
-    // Попытка 3: Удаление висячих запятых перед } или ]
+    try { return JSON.parse(jsonBlock); } catch (e) {}
     const noTrailing = jsonBlock.replace(/,\s*([}\]])/g, '$1');
-    try {
-      return JSON.parse(noTrailing);
-    } catch (e) {}
+    try { return JSON.parse(noTrailing); } catch (e) {}
   }
 
-  // Попытка 4: Умный Regex-парсер для извлечения полей даже при сломанных внутренних кавычках
   const keys = ["offer", "price", "delivery", "qualification", "objections", "closing", "score", "pros", "cons"];
   const result = {};
   let matchedCount = 0;
@@ -1047,48 +1066,14 @@ function cleanAndParseJSON(raw) {
   }
 
   const scoreMatch = str.match(/"score"\s*:\s*"?(\d{1,2})"?/i);
-  if (scoreMatch) {
-    result.score = scoreMatch[1];
-    matchedCount++;
-  }
+  if (scoreMatch) { result.score = scoreMatch[1]; matchedCount++; }
 
   if (matchedCount >= 2) {
-    keys.forEach(k => {
-      if (!result[k]) result[k] = "—";
-    });
+    keys.forEach(k => { if (!result[k]) result[k] = "—"; });
     if (!result.score) result.score = "7";
     return result;
   }
 
-  // Попытка 5: Если модель выдала текстовый формат (Оффер: ... Цена: ...)
-  const textKeys = [
-    { key: "offer", pattern: /(?:ОФФЕР|ЧТО ПРЕДЛАГАЮТ|ПРОДУКТ)[\s:]+([^\n]+(?:\n(?!ЦЕНА|СТОИМОСТЬ|ДОСТАВКА|КВАЛИФИКАЦИЯ|ВОЗРАЖЕНИЯ|ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
-    { key: "price", pattern: /(?:ЦЕНА|СТОИМОСТЬ|ТАРИФЫ)[\s:]+([^\n]+(?:\n(?!ДОСТАВКА|КВАЛИФИКАЦИЯ|ВОЗРАЖЕНИЯ|ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
-    { key: "delivery", pattern: /(?:ДОСТАВКА|УСЛОВИЯ ДОСТАВКИ|СРОКИ)[\s:]+([^\n]+(?:\n(?!КВАЛИФИКАЦИЯ|ВОЗРАЖЕНИЯ|ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
-    { key: "qualification", pattern: /(?:КВАЛИФИКАЦИЯ|ВЫЯВЛЕНИЕ ПОТРЕБНОСТЕЙ)[\s:]+([^\n]+(?:\n(?!ВОЗРАЖЕНИЯ|ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
-    { key: "objections", pattern: /(?:ВОЗРАЖЕНИЯ|ОТРАБОТКА ВОЗРАЖЕНИЙ)[\s:]+([^\n]+(?:\n(?!ДОЖИМ|ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
-    { key: "closing", pattern: /(?:ДОЖИМ|ТАКТИКА ДОЖИМА)[\s:]+([^\n]+(?:\n(?!ОЦЕНКА|ПЛЮСЫ|МИНУСЫ)[^\n]+)*)/i },
-    { key: "pros", pattern: /(?:ПЛЮСЫ|СИЛЬНЫЕ СТОРОНЫ)[\s:]+([^\n]+(?:\n(?!МИНУСЫ)[^\n]+)*)/i },
-    { key: "cons", pattern: /(?:МИНУСЫ|СЛАБЫЕ СТОРОНЫ|ОШИБКИ)[\s:]+([^\n]+)/i }
-  ];
-
-  let textMatchCount = 0;
-  textKeys.forEach(tk => {
-    const tm = str.match(tk.pattern);
-    if (tm && tm[1]) {
-      result[tk.key] = tm[1].trim();
-      textMatchCount++;
-    } else if (!result[tk.key]) {
-      result[tk.key] = "—";
-    }
-  });
-
-  if (textMatchCount >= 2) {
-    if (!result.score) result.score = "7";
-    return result;
-  }
-
-  // Попытка 6: Аварийный мягкий фоллбек (сохраняем текст ответа ИИ в поле "offer", чтобы ничего не потерялось)
   return {
     offer: str.length > 500 ? str.slice(0, 500) + '...' : str,
     price: "См. детали в оффере",
@@ -1097,12 +1082,11 @@ function cleanAndParseJSON(raw) {
     objections: "—",
     closing: "—",
     score: "6",
-    pros: "Данные успешно получены",
+    pros: "Данные получены",
     cons: "—"
   };
 }
 
-// --- Выполнение AI-анализа (Создание или Обновление) ---
 async function executeIncrementalAnalysis() {
   const cfg = getApiConfig();
   if (!cfg.apiKey) {
@@ -1117,14 +1101,8 @@ async function executeIncrementalAnalysis() {
   const closingBehavior = document.getElementById("closingSelect").value;
   const userNotes = document.getElementById("dialogTranscriptInput").value.trim();
 
-  if (!name) {
-    alert("Укажите имя конкурента или сотрудника.");
-    return;
-  }
-  if (!activePickedFile && !userNotes) {
-    alert("Загрузите файл (КП, аудио, счет) или введите текст диалога/заметки.");
-    return;
-  }
+  if (!name) { alert("Укажите имя конкурента или сотрудника."); return; }
+  if (!activePickedFile && !userNotes) { alert("Загрузите файл (КП, аудио, счет) или введите текст диалога/заметки."); return; }
 
   const proj = getActiveProject();
   const existingSub = currentEditingSubjectId ? proj.evaluatedList.find(s => s.id === currentEditingSubjectId) : null;
@@ -1146,48 +1124,37 @@ async function executeIncrementalAnalysis() {
       promptText += `\n\nПроанализируй первое касание и сформируй полное коммерческое досье.`;
     }
 
-    promptText += `\n\nСТРОГОЕ ПРАВИЛО: Верни ответ ТОЛЬКО в формате JSON. Внутри значений свойств КАТЕГОРИЧЕСКИ НЕ ИСПОЛЬЗУЙ двойные кавычки " (заменяй их на 'одинарные' или «елочки»), чтобы не сломать парсер.
-Формат ответа:
+    promptText += `\n\nСТРОГОЕ ПРАВИЛО: Верни ответ ТОЛЬКО в формате JSON. Внутри значений свойств КАТЕГОРИЧЕСКИ НЕ ИСПОЛЬЗУЙ двойные кавычки " (заменяй их на 'одинарные' или «елочки»).
+Формат:
 {
   "offer": "Что предлагают: состав пакета, номенклатура, состав услуг, комплектация",
   "price": "Цены, порядок оплаты, скрытые комиссии, курс валют, предоплата, условия скидок",
   "delivery": "Сроки, логистика, Incoterms, гарантийные обязательства, штрафы",
-  "qualification": "Квалификация: задавались ли открытые вопросы о задачах, бюджете, ЛПР",
+  "qualification": "Квалификация: открытые вопросы о задачах, бюджете, ЛПР",
   "objections": "Отработка сомнений: аргументы ценности против падения в скидку",
   "closing": "Дожим: дедлайн, CTA, договоренность о следующем шаге",
   "score": "7",
-  "pros": "Сильные стороны оффера/менеджера (что перенять)",
-  "cons": "Слабые места, риски, непрозрачность (где мы сильнее)"
+  "pros": "Сильные стороны оффера/менеджера",
+  "cons": "Слабые места, риски, непрозрачность"
 }`;
 
     let userContent = [{ type: "text", text: promptText }];
-    if (userNotes) {
-      userContent.push({ type: "text", text: `Заметки / Текст диалога:\n${userNotes}` });
-    }
+    if (userNotes) userContent.push({ type: "text", text: `Заметки / Текст диалога:\n${userNotes}` });
 
     if (activePickedFile) {
       const { b64, mime } = await fileToBase64Data(activePickedFile);
       const ext = activePickedFile.name.split('.').pop().toLowerCase();
       if (activePickedFile.type.startsWith('audio/') || ['mp3', 'wav', 'm4a', 'ogg', 'aac', 'flac'].includes(ext)) {
         const audioFormat = ext === 'wav' ? 'wav' : (ext === 'm4a' ? 'm4a' : 'mp3');
-        userContent.push({
-          type: "input_audio",
-          input_audio: { data: b64, format: audioFormat }
-        });
+        userContent.push({ type: "input_audio", input_audio: { data: b64, format: audioFormat } });
       } else {
-        userContent.push({
-          type: "image_url",
-          image_url: { url: `data:${mime};base64,${b64}` }
-        });
+        userContent.push({ type: "image_url", image_url: { url: `data:${mime};base64,${b64}` } });
       }
     }
 
     const response = await fetch(`${cfg.apiBase}/chat/completions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${cfg.apiKey}`
-      },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cfg.apiKey}` },
       body: JSON.stringify({
         model: cfg.model,
         messages: [{ role: "user", content: userContent }],
@@ -1196,14 +1163,10 @@ async function executeIncrementalAnalysis() {
       })
     });
 
-    if (!response.ok) {
-      const errTxt = await response.text();
-      throw new Error(`Ошибка API (${response.status}): ${errTxt}`);
-    }
+    if (!response.ok) throw new Error(`Ошибка API (${response.status}): ${await response.text()}`);
 
     const data = await response.json();
-    const raw = data.choices[0].message.content;
-    const result = cleanAndParseJSON(raw);
+    const result = cleanAndParseJSON(data.choices[0].message.content);
 
     const speedDisplay = speedDelta ? `${speedDelta} (${channel})` : channel;
     const recalledDisplay = closingBehavior;
@@ -1244,7 +1207,7 @@ async function executeIncrementalAnalysis() {
     renderMatrix();
     renderProjectsTabs();
 
-    setStatus("Успешно сохранено!", "success");
+    setStatus("Успешно сохранено в облако!", "success");
     setTimeout(() => setStatus(null), 3000);
     resetFormToNew();
 
@@ -1257,7 +1220,7 @@ async function executeIncrementalAnalysis() {
   }
 }
 
-// --- Отрисовка Матрицы ---
+// Отрисовка матрицы
 function renderMatrix() {
   const proj = getActiveProject();
   const header = document.getElementById("matrixHeader");
@@ -1281,7 +1244,7 @@ function renderMatrix() {
           <div style="font-size:10px; opacity:0.8; margin-top:2px;">${isInternal ? '🏢 Наш аудит' : '🎯 Конкурент'}</div>
         </div>
         <div style="display:flex; gap:4px; margin-left:6px;">
-          <button class="btn btn-secondary btn-xs" style="padding:2px 6px;" title="Дополнить досье новыми данными" onclick="loadSubjectForUpdating('${sub.id}')">✏️ Дополнить</button>
+          <button class="btn btn-secondary btn-xs" style="padding:2px 6px;" title="Дополнить досье" onclick="loadSubjectForUpdating('${sub.id}')">✏️ Дополнить</button>
           <button class="btn btn-danger btn-xs" style="padding:2px 6px;" title="Удалить" onclick="removeSubject(${sIdx})">✕</button>
         </div>
       </div>
@@ -1379,7 +1342,7 @@ function saveOurStandard() {
   proj.ourStandard.delivery = document.getElementById("ourStdDelivery").value;
   persistDatabase();
   renderMatrix();
-  alert("Эталон компании сохранен.");
+  alert("Эталон компании сохранен в облако.");
 }
 
 function switchRightView(view) {
@@ -1389,7 +1352,7 @@ function switchRightView(view) {
   document.getElementById("reportViewContainer").style.display = view === 'report' ? 'block' : 'none';
 }
 
-// --- ПРОФЕССИОНАЛЬНЫЙ СТРАТЕГИЧЕСКИЙ АУДИТ (SENIOR CMO) ---
+// --- Стратегический анализ ---
 async function generateStrategicReport() {
   const proj = getActiveProject();
   if (!proj.evaluatedList.length) {
@@ -1454,10 +1417,7 @@ ${isWithUs ? `
 
     const res = await fetch(`${cfg.apiBase}/chat/completions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${cfg.apiKey}`
-      },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cfg.apiKey}` },
       body: JSON.stringify({
         model: cfg.model,
         messages: [{ role: "user", content: prompt }],
@@ -1485,7 +1445,7 @@ function saveCurrentReportText() {
   const html = document.getElementById("strategicReportContent").innerHTML;
   proj.savedReport = html;
   persistDatabase();
-  alert("Расчет и стратегический аудит успешно зафиксированы в проекте!");
+  alert("Расчет и стратегический аудит успешно зафиксированы в облаке!");
 }
 
 function printReport() {
@@ -1504,29 +1464,6 @@ function exportDatabaseJSON() {
   document.body.appendChild(link);
   link.click();
   link.remove();
-}
-
-function importDatabaseJSON(input) {
-  if (!input.files || !input.files[0]) return;
-  const file = input.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if (imported.projects && Array.isArray(imported.projects)) {
-        globalDatabase = imported;
-        persistDatabase();
-        renderProjectsTabs();
-        loadCurrentProjectView();
-        alert("База успешно импортирована!");
-      } else {
-        alert("Неверный формат файла бэкапа.");
-      }
-    } catch(err) {
-      alert("Ошибка чтения JSON: " + err.message);
-    }
-  };
-  reader.readAsText(file);
 }
 
 function exportToCSV() {
@@ -1600,16 +1537,18 @@ function saveSettings() {
   const c = {
     apiKey: document.getElementById("cfgApiKey").value.trim(),
     apiBase: document.getElementById("cfgApiBase").value.trim(),
-    model: document.getElementById("cfgModel").value.trim()
+    model: document.getElementById("cfgModel").value.trim(),
+    cloudUrl: document.getElementById("cfgCloudUrl").value.trim()
   };
-  localStorage.setItem("speshu_cfg_v9", JSON.stringify(c));
+  localStorage.setItem("speshu_cfg_v11", JSON.stringify(c));
   closeSettingsModal();
+  syncWithCloud();
 }
 
 async function testApiConnection() {
   const cfg = getApiConfig();
   const resElem = document.getElementById("apiTestResult");
-  resElem.textContent = "Проверка соединения...";
+  resElem.textContent = "Проверка...";
   resElem.style.color = "#93c5fd";
 
   try {
@@ -1621,7 +1560,7 @@ async function testApiConnection() {
     resElem.textContent = `✅ Соединение установлено! Баланс: ${data.amount ?? '0'} ₽`;
     resElem.style.color = "#34d399";
   } catch (err) {
-    resElem.textContent = `❌ Ошибка подключения: ${err.message}.`;
+    resElem.textContent = `❌ Ошибка: ${err.message}.`;
     resElem.style.color = "#f87171";
   }
 }
